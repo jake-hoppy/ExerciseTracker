@@ -10,7 +10,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// A session defined once and reused across blocks, never retyped per day.
+// A session defined once and reused, never retyped per day.
 model WorkoutType {
   id     String  @id @default(cuid())
   name   String  @unique
@@ -18,40 +18,51 @@ model WorkoutType {
   days   Day[]
 }
 
+// Singleton: the app's standing configuration (D4). The workout for any date
+// is computed from pattern + anchorDate (rule R1b), never pre-generated.
+model Settings {
+  id            String @id @default("singleton")
+  // "weekly" | "cycle"
+  scheduleMode  String
+  // cycle: [typeId, ...] indexed from anchorDate
+  // weekly: [typeId x7], index 0 = Sunday
+  pattern       Json
+  // YYYY-MM-DD, day 0 of the cycle (rule R7)
+  anchorDate    String
+  // Defaults when no Block covering a date sets targets (D7, rule R6b).
+  calTarget     Int?
+  proteinTarget Int?
+}
+
+// Optional label over a date range. Not a container: it has no relation to
+// Day and covers one only by date (D4). Overlaps and retroactive blocks are fine.
 model Block {
   id            String  @id @default(cuid())
   name          String
   // Calendar dates as YYYY-MM-DD strings (rule R7). Never timestamps.
   startDate     String
-  endDate       String
-  // "weekly" | "cycle". The pattern generates Days once; after that each Day
-  // is the source of truth (D4b).
-  scheduleMode  String
-  // weekly: { mon: typeId, ... }   cycle: [typeId, typeId, ...]
-  pattern       Json
+  // null = ongoing
+  endDate       String?
   startWeight   Float?
   goalWeight    Float?
-  // One flat target across all days (D7, rule R6b).
-  calTarget     Int
-  proteinTarget Int
-  days          Day[]
+  // Overrides Settings targets for dates in range (D7, rule R6b).
+  calTarget     Int?
+  proteinTarget Int?
 }
 
-// Calories and protein are not columns: they sum from Entry rows (rule R6c).
+// One row per calendar date, created the first time something is logged on
+// it (rule R1b). Calories and protein are not columns: they sum from Entry
+// rows (rule R6c).
 model Day {
-  id            String      @id @default(cuid())
-  date          String // YYYY-MM-DD
-  block         Block       @relation(fields: [blockId], references: [id], onDelete: Cascade)
-  blockId       String
-  workoutType   WorkoutType @relation(fields: [workoutTypeId], references: [id])
-  workoutTypeId String
-  trained       Boolean     @default(false)
+  id            String       @id @default(cuid())
+  date          String       @unique // YYYY-MM-DD
+  // Override for this one day; null follows Settings.pattern.
+  workoutType   WorkoutType? @relation(fields: [workoutTypeId], references: [id])
+  workoutTypeId String?
+  trained       Boolean      @default(false)
   weight        Float?
   notes         String?
   entries       Entry[]
-
-  @@unique([blockId, date])
-  @@index([date])
 }
 
 model FoodItem {

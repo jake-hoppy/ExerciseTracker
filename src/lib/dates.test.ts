@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, eachDate, isDateString, weekdayIndex } from "./dates";
+import { addDays, daysBetween, eachDate, isDateString, today, weekdayIndex } from "./dates";
 
 describe("isDateString", () => {
   it("accepts real calendar dates", () => {
@@ -52,5 +52,27 @@ describe("eachDate", () => {
   it("handles a one-day range and rejects a backward one", () => {
     expect(eachDate("2026-08-13", "2026-08-13")).toEqual(["2026-08-13"]);
     expect(() => eachDate("2026-08-14", "2026-08-13")).toThrow();
+  });
+});
+
+describe("daysBetween", () => {
+  it("counts calendar days, signed", () => {
+    expect(daysBetween("2026-08-13", "2026-09-11")).toBe(29);
+    expect(daysBetween("2026-09-21", "2026-09-20")).toBe(-1);
+    expect(daysBetween("2026-02-28", "2028-02-29")).toBe(731);
+  });
+
+  it("is unaffected by DST transitions", () => {
+    expect(daysBetween("2026-03-07", "2026-03-09")).toBe(2);
+    expect(daysBetween("2026-10-31", "2026-11-02")).toBe(2);
+  });
+});
+
+describe("today", () => {
+  it("reads the calendar date in the home zone, not UTC", () => {
+    // 2026-09-22 04:30 UTC is still 22:30 on the 21st in Denver (MDT, UTC-6).
+    const lateEvening = new Date("2026-09-22T04:30:00Z");
+    expect(today("America/Denver", lateEvening)).toBe("2026-09-21");
+    expect(today("UTC", lateEvening)).toBe("2026-09-22");
   });
 });

@@ -47,3 +47,23 @@ export function eachDate(start: DateString, end: DateString): DateString[] {
   for (let d = start; d <= end; d = addDays(d, 1)) out.push(d);
   return out;
 }
+
+/** Whole calendar days from `from` to `to`; negative when `to` is earlier. */
+export function daysBetween(from: DateString, to: DateString): number {
+  return Math.round((toUtc(to).getTime() - toUtc(from).getTime()) / 86_400_000);
+}
+
+// The one user logs in Mountain time (rule R7). The server runs in UTC, so
+// "today" must be read in this zone or an evening log lands on tomorrow.
+export const HOME_TIME_ZONE = "America/Denver";
+
+/** The calendar date it is right now in `timeZone`. */
+export function today(timeZone = HOME_TIME_ZONE, now = new Date()): DateString {
+  // en-CA formats as YYYY-MM-DD.
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+}

@@ -58,9 +58,11 @@ from `@/generated/prisma/client`, and use `db` from `@/lib/db` in app code.
 docs/          Decisions, roadmap, domain rules, design system. Read before building.
 data/          Seed data — the completed 30-day block.
 prisma/        Schema, migrations, seed script.
-src/app/       Routes. `/` lists the latest block's days.
-src/lib/       dates (calendar-date helpers), format (all user-visible
-               numbers), totals (day totals from entries), db (Prisma client).
+src/app/       Routes. `/` shows today and every logged day, newest first.
+src/lib/       dates (calendar-date helpers, today in Mountain time), schedule
+               (workout for any date, target resolution), days (ensureDay),
+               format (all user-visible numbers), totals (day totals from
+               entries), db (Prisma client).
 scripts/       shot.mjs for /verify-ui.
 .claude/       Subagent and command definitions.
 ```

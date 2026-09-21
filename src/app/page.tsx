@@ -1,8 +1,9 @@
 import { connection } from "next/server";
 import { db } from "@/lib/db";
+import { today } from "@/lib/dates";
+import { blocksCovering, targetsFor, workoutTypeIdFor } from "@/lib/schedule";
 import { dayTotals } from "@/lib/totals";
 import {
-  formatDateRange,
   formatGrams,
   formatKcal,
   formatShortDate,
@@ -10,50 +11,61 @@ import {
   formatWeight,
 } from "@/lib/format";
 
-async function getLatestBlock() {
-  return db.block.findFirst({
-    orderBy: { startDate: "desc" },
-    include: {
-      days: {
-        orderBy: { date: "asc" },
-        include: {
-          workoutType: true,
-          entries: { select: { calories: true, protein: true } },
-        },
-      },
-    },
-  });
+async function getLog() {
+  const [settings, types, blocks, days] = await Promise.all([
+    db.settings.findUnique({ where: { id: "singleton" } }),
+    db.workoutType.findMany(),
+    db.block.findMany(),
+    db.day.findMany({
+      orderBy: { date: "desc" },
+      include: { entries: { select: { calories: true, protein: true } } },
+    }),
+  ]);
+  return { settings, types, blocks, days };
 }
 
 export default async function Home() {
   await connection();
-  const block = await getLatestBlock();
+  const { settings, types, blocks, days } = await getLog();
 
-  if (!block) {
+  if (!settings) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-10">
         <p className="text-ink-dim">
-          No block yet. Seed one with <code className="font-mono">npm run db:seed</code>.
+          No schedule yet. Seed one with <code className="font-mono">npm run db:seed</code>.
         </p>
       </main>
     );
   }
 
+  const date = today();
+  const typeById = new Map(types.map((t) => [t.id, t]));
+  const sessionFor = (d: string, override: string | null) =>
+    typeById.get(workoutTypeIdFor(d, settings, override));
+
+  // Today is always on the list, whether or not anything is logged yet (R1b).
+  const rows = days.some((d) => d.date === date)
+    ? days
+    : [{ id: "today", date, workoutTypeId: null, weight: null, notes: null, entries: [] }, ...days];
+
+  const session = sessionFor(date, days.find((d) => d.date === date)?.workoutTypeId ?? null);
+  const targets = targetsFor(date, blocks, settings);
+  const block = blocksCovering(date, blocks)[0];
+
   return (
     <main className="mx-auto max-w-2xl px-4 pt-8 pb-16">
       <header className="mb-6">
-        <p className="label">Block · {block.days.length} days</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold tracking-wide text-parchment uppercase">
-          {block.name}
-        </h1>
-        <p className="mt-1 font-mono text-sm text-ink-dim">
-          {formatDateRange(block.startDate, block.endDate)}
+        <p className="label">
+          Today · {formatWeekday(date)} {formatShortDate(date)}
+          {block && <> · {block.name}</>}
         </p>
+        <h1 className="mt-1 font-display text-3xl font-semibold tracking-wide text-parchment uppercase">
+          {session?.name ?? "—"}
+        </h1>
 
-        <dl className="mt-5 grid grid-cols-3 gap-px overflow-hidden rounded-card border border-line bg-line-soft">
-          <Stat label="Calories" value={formatKcal(block.calTarget)} unit="kcal" />
-          <Stat label="Protein" value={formatGrams(block.proteinTarget)} unit="g" />
-          <Stat label="Start" value={formatWeight(block.startWeight)} unit="lb" />
+        <dl className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-card border border-line bg-line-soft">
+          <Stat label="Calories" value={formatKcal(targets.calTarget)} unit="kcal" />
+          <Stat label="Protein" value={formatGrams(targets.proteinTarget)} unit="g" />
         </dl>
       </header>
 
@@ -66,15 +78,18 @@ export default async function Home() {
       </div>
 
       <ol className="space-y-1.5">
-        {block.days.map((day) => {
+        {rows.map((day) => {
           const totals = dayTotals(day.entries);
           const logged = day.entries.length > 0;
-          const isRest = day.workoutType.isRest;
-          const border = logged
-            ? "border-l-moss"
-            : isRest
-              ? "border-l-ink-faint"
-              : "border-l-line";
+          const workout = sessionFor(day.date, day.workoutTypeId);
+          const isRest = workout?.isRest ?? false;
+          const border = day.date === date
+            ? "border-l-rust"
+            : logged
+              ? "border-l-moss"
+              : isRest
+                ? "border-l-ink-faint"
+                : "border-l-line";
 
           return (
             <li
@@ -96,7 +111,7 @@ export default async function Home() {
                     isRest ? "text-ink-dim" : "text-ink"
                   }`}
                 >
-                  {day.workoutType.name}
+                  {workout?.name ?? "—"}
                 </div>
                 {day.notes && (
                   <p className="truncate text-sm text-ink-dim">{day.notes}</p>
