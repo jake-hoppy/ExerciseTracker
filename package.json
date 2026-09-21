@@ -1,0 +1,11 @@
+{
+  "name": "exercise-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "@neon/config": "^1.7.2",
+    "@neon/env": "^1.4.3"
+  }
+}
