@@ -11,10 +11,18 @@ Each phase ends with a stop-for-review checkpoint.
 ## Phase 1 — It exists and it persists
 
 - Scaffold, database, schema, migrations
-- Seed the completed 30-day block from `data/seed-block.json`
+- `Settings` singleton: cycle pattern, anchor date, default targets
+- Seed the completed block's days from `data/seed-block.json`, plus the food
+  item list from `docs/07-food-log.md`
 - One route that lists days and their logged values
 
-**Done when:** the finished block's data is in a real database and renders.
+**Done when:** the seeded days are in a real database and render, and a `Day`
+row can be created for today without any block existing.
+
+> **Schema revised after Phase 1 was first built.** `Day` no longer belongs to
+> a `Block`; days are created lazily and the workout is computed from
+> `Settings`. See decision D4. If Phase 1 shipped the old container schema,
+> migrate before Phase 2.
 
 ## Phase 1.5 — Design pass
 
@@ -31,6 +39,7 @@ than improvising screens while also building data plumbing.
   weight, a `trained` tick, notes
 - **Food log with saved items** — see `docs/07-food-log.md`. This is the core
   of the app, not a Phase 4 extra. Seed the item list up front.
+- Logging on a date with no `Day` row creates it — no setup step, ever
 - Writes persist immediately; no explicit save button
 - Works one-handed at 390px wide — this gets used half-asleep
 - Block view: every day, grouped, editable inline

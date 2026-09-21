@@ -77,6 +77,10 @@ for review rather than running ahead — a half-built Phase 3 blocks Phase 2
 from being usable. (`docs/08-autonomous-run.md` is the exception, for
 unattended runs.)
 
+**Any date is loggable.** Days are created when something is logged on them;
+the workout is computed from `Settings`, not pre-generated. Blocks are optional
+labels over date ranges. Never gate logging on a block existing.
+
 **A field nobody fills is worse than no field.** Several were cut for this
 reason — waist, resting HR, the food-logged and protein-hit checkboxes. Don't
 add one back without the user saying they'll use it.

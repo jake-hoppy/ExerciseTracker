@@ -93,59 +93,66 @@ Metric   OPTIONAL, Phase 4 — arbitrary tracked measurements (waist, resting HR
   actually log today.
 - A metric table is flexible but turns every screen into a join and a pivot.
 
-**DECIDED, and narrowed further after review:**
+**DECIDED — revised. Days stand alone; blocks are optional labels.**
+
+The first version made `Block` a container that pre-generated a fixed set of
+`Day` rows. That reproduced the prototype's real problem in a nicer form: when
+the days ran out there was nowhere to log until someone created a new block.
 
 ```prisma
-Day  date, blockId, workoutTypeId, trained (Boolean), weight (Float?), notes
+model Settings {            // singleton — the app's standing configuration
+  id            String   @id @default("singleton")
+  scheduleMode  String                  // "weekly" | "cycle"
+  pattern       Json                    // ["Push + Run","Pull + Run","Legs","Rest"]
+  anchorDate    DateTime                // day 0 of the cycle
+  calTarget     Int?                    // defaults when no Block covers a date
+  proteinTarget Int?
+}
+
+model Day {
+  id            String   @id @default(cuid())
+  date          DateTime @unique        // ONE row per calendar date, forever
+  workoutTypeId String?                 // null = compute from Settings.pattern
+  trained       Boolean  @default(false)
+  weight        Float?
+  notes         String?
+  entries       Entry[]
+}
+
+model Block {                // OPTIONAL. A label over a range, not a container.
+  id            String    @id @default(cuid())
+  name          String                  // "The 30-Day Traverse"
+  startDate     DateTime
+  endDate       DateTime?               // null = ongoing
+  calTarget     Int?
+  proteinTarget Int?
+}
 ```
 
-That is the whole of `Day`. Calories and protein are NOT columns — they sum
-from `Entry` rows (see `docs/07-food-log.md` and rule R6c).
+**Three consequences, all deliberate:**
 
-**Cut, deliberately:**
-- The `Metric` table. Never being built. Resting HR, sleep and the rest are
-  fields that would sit empty every day, and an empty field makes a complete
-  day look unfinished.
-- `waist`. Same reason — it was proposed on the theory it *should* be tracked,
-  not because anyone would track it.
-- `foodLogged` and `proteinHit` booleans. The logged numbers are the record;
-  a checkbox beside them is ceremony.
-- `workoutDone` collapses to a single `trained` boolean.
+1. **Days are created lazily.** A `Day` row appears the first time something is
+   logged on that date. Nothing is pre-generated, so nothing ever runs out.
+   There is no "active block" state and no empty-because-unscheduled screen.
 
-The principle: **a field nobody fills is worse than no field.** Don't add one
-back without someone saying they'll use it.
+2. **The workout is computed, not stored.** For `cycle` mode:
+   `pattern[daysBetween(anchorDate, date) % pattern.length]`. For `weekly`,
+   index by day of week. That resolves for any date, past or future, with no
+   generation step. `Day.workoutTypeId` is a nullable **override** — set it and
+   that one day differs; leave it null and it follows the pattern. Editing one
+   Thursday must never mean touching the pattern.
 
----
+3. **Blocks are retroactive and optional.** `Block` has no relation to `Day`;
+   it covers a day only by date range. Define one after the fact over days
+   already logged, overlap them if you like, or never create one — logging
+   with no block at all is the normal case.
 
-## D4b. How a block's schedule is defined
+**Target resolution**, in order: a `Block` whose range covers the date and sets
+targets → `Settings` defaults → no target shown. Never a hardcoded number.
 
-**The prototype's central flaw was hardcoding 30 dates in source.** Nothing
-about block length or schedule may live in code.
-
-Two ways people actually schedule, and both need supporting:
-
-- **Weekly** — "Monday is Push, Tuesday is Pull, Wednesday off." Anchored to
-  weekdays. Fits around a class schedule.
-- **Cycle** — "Push, Pull, Legs, Rest, repeat" regardless of weekday. The
-  Aug–Sep block was this: a 4-day rotation that drifted across the week.
-
-**DECIDED: support both, and treat the pattern as a GENERATOR, not the source
-of truth.**
-
-```
-WorkoutType    id, name ("Push + Run"), isRest      — user-defined, reused across blocks
-Block          scheduleMode: "weekly" | "cycle"
-               pattern: JSON  {mon: typeId, ...} | [typeId, typeId, ...]
-Day            workoutTypeId  — generated from the pattern, then freely editable
-```
-
-Creating a block runs the pattern to generate its `Day` rows. **After that,
-each day's workout is independently editable.** Swapping one Thursday's legs
-session for a run must not require touching the template or fighting it.
-Templates that stay authoritative are the ones people work around.
-
-`WorkoutType` is a table, not a free-text string on `Day` — so a session is
-something defined once and reused, not retyped and eventually typo'd.
+**Cut, deliberately:** the `Metric` table, `waist`, and the `foodLogged` /
+`proteinHit` booleans. `workoutDone` collapses to `trained`. A field nobody
+fills is worse than no field.
 
 ---
 
@@ -182,8 +189,9 @@ the hardest days.
 across all days.**
 
 ```
-Block.calTarget       e.g. 2100
-Block.proteinTarget   e.g. 150
+Settings.calTarget      e.g. 2100    // the standing default
+Settings.proteinTarget  e.g. 150
+Block.calTarget                      // optional override for a labelled period
 ```
 
 The reasoning is adherence. One number that needs no thought beats a two-tier

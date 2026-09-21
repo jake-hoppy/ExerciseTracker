@@ -69,6 +69,8 @@ database and no search-first flow.
   No confirmation toasts for routine entry.
 - **Empty means unlogged, not zero.** A day with no entry must not read as a
   zero-calorie day.
+- **Never show an "out of range" or "no active block" state.** Any date is
+  loggable. Opening the app always offers somewhere to write.
 
 ## Visual direction
 

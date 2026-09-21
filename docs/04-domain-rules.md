@@ -26,6 +26,21 @@ Hitting the target is **not** part of this. A day where you logged 2,800
 against a 2,100 target is a logged day. The streak measures whether you're
 tracking, not whether you were good.
 
+## R1b. Days are created when logged
+
+There is no pre-generated calendar and no "active block". A `Day` row comes
+into existence the first time something is logged on that date, and any date
+is always available — past, today, or a year from now.
+
+The day's session is **computed**, not stored:
+`pattern[daysBetween(Settings.anchorDate, date) % pattern.length]` in cycle
+mode, or day-of-week in weekly mode. `Day.workoutTypeId`, when set, overrides
+it for that one day.
+
+Never write code that asks "which block is this day in?" as a precondition for
+logging. Blocks are optional labels over date ranges (decision D4) and a day
+belonging to none is the normal case.
+
 ## R2. Current streak
 
 Walk backward from today counting consecutive logged days. Stop at the first
@@ -70,8 +85,12 @@ from averages entirely — it must not drag the mean down.
 
 ## R6b. Targets are flat across all days
 
-One calorie target and one protein target per block, compared against every
-day identically — training days and rest days alike.
+One calorie target and one protein target, compared against every day
+identically — training days and rest days alike.
+
+Resolution order: a `Block` covering the date that sets targets → `Settings`
+defaults → no target shown. Never a hardcoded number, and never a per-day-type
+target.
 
 A two-tier target (higher on training days) was proposed and **deliberately
 rejected**; see decision D7. Adherence to one number beats optimisation across
