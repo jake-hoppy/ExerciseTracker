@@ -33,3 +33,12 @@ prisma/dev.db*
 
 # Screenshots
 .shots/
+
+# Next.js / tooling
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+coverage/
+
+# Prisma generated client
+src/generated/

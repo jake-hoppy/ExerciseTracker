@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+/* Tokens from docs/03-design-system.md. */
+@theme {
+  --color-bg: #262c29;
+  --color-bg-alt: #2d3430;
+  --color-surface: #343b37;
+  --color-surface-2: #3d453f;
+  --color-line: #4e564f;
+  --color-line-soft: #404842;
+
+  --color-ink: #f2efe6;
+  --color-ink-dim: #b7beb8;
+  --color-ink-faint: #818b83;
+
+  --color-moss: #8cad7b;
+  --color-moss-dim: #6c8961;
+  --color-rust: #d08a48;
+  --color-rust-dim: #a16c34;
+  --color-parchment: #f5f0df;
+  --color-danger: #c96b4c;
+
+  --font-display: var(--font-oswald), "Oswald", sans-serif;
+  --font-serif: var(--font-source-serif), "Source Serif 4", Georgia, serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+
+  --radius-card: 3px;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  background:
+    radial-gradient(ellipse 80% 50% at 0% 0%, rgb(140 173 123 / 0.1), transparent 70%),
+    radial-gradient(ellipse 70% 45% at 100% 0%, rgb(208 138 72 / 0.08), transparent 70%),
+    var(--color-bg);
+  background-attachment: fixed;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-rust);
+  outline-offset: 2px;
+}
+
+/* Labels: uppercase, small, tracked, faint. */
+.label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

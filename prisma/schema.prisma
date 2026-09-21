@@ -1,0 +1,82 @@
+// Schema shape is decided in docs/01-architecture-decisions.md (D4, D4b, D7)
+// and docs/07-food-log.md. Keep it free of Postgres-specific types (D3).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// A session defined once and reused across blocks, never retyped per day.
+model WorkoutType {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  isRest Boolean @default(false)
+  days   Day[]
+}
+
+model Block {
+  id            String  @id @default(cuid())
+  name          String
+  // Calendar dates as YYYY-MM-DD strings (rule R7). Never timestamps.
+  startDate     String
+  endDate       String
+  // "weekly" | "cycle". The pattern generates Days once; after that each Day
+  // is the source of truth (D4b).
+  scheduleMode  String
+  // weekly: { mon: typeId, ... }   cycle: [typeId, typeId, ...]
+  pattern       Json
+  startWeight   Float?
+  goalWeight    Float?
+  // One flat target across all days (D7, rule R6b).
+  calTarget     Int
+  proteinTarget Int
+  days          Day[]
+}
+
+// Calories and protein are not columns: they sum from Entry rows (rule R6c).
+model Day {
+  id            String      @id @default(cuid())
+  date          String // YYYY-MM-DD
+  block         Block       @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  blockId       String
+  workoutType   WorkoutType @relation(fields: [workoutTypeId], references: [id])
+  workoutTypeId String
+  trained       Boolean     @default(false)
+  weight        Float?
+  notes         String?
+  entries       Entry[]
+
+  @@unique([blockId, date])
+  @@index([date])
+}
+
+model FoodItem {
+  id        String    @id @default(cuid())
+  name      String
+  calories  Int
+  protein   Int
+  timesUsed Int       @default(0)
+  lastUsed  DateTime?
+  archived  Boolean   @default(false)
+  entries   Entry[]
+}
+
+// Entries copy the numbers rather than referencing them, so correcting a
+// saved item never rewrites history. itemId exists for usage counts only.
+model Entry {
+  id       String    @id @default(cuid())
+  day      Day       @relation(fields: [dayId], references: [id], onDelete: Cascade)
+  dayId    String
+  item     FoodItem? @relation(fields: [itemId], references: [id], onDelete: SetNull)
+  itemId   String?
+  name     String?
+  calories Int
+  protein  Int
+  loggedAt DateTime  @default(now())
+
+  @@index([dayId])
+}
