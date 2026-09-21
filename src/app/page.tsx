@@ -1,6 +1,6 @@
 import { connection } from "next/server";
 import { db } from "@/lib/db";
-import { today } from "@/lib/dates";
+import { eachDate, today } from "@/lib/dates";
 import { blocksCovering, targetsFor, workoutTypeIdFor } from "@/lib/schedule";
 import { dayTotals } from "@/lib/totals";
 import {
@@ -43,10 +43,18 @@ export default async function Home() {
   const sessionFor = (d: string, override: string | null) =>
     typeById.get(workoutTypeIdFor(d, settings, override));
 
-  // Today is always on the list, whether or not anything is logged yet (R1b).
-  const rows = days.some((d) => d.date === date)
-    ? days
-    : [{ id: "today", date, workoutTypeId: null, weight: null, notes: null, entries: [] }, ...days];
+  // Every date from the first Day through today is listed, logged or not
+  // (R1b, R1c): a hidden gap reads as "nothing happened" when it means
+  // "not logged yet". Days are newest first, so the oldest is last.
+  const byDate = new Map(days.map((d) => [d.date, d]));
+  const first = days.at(-1)?.date ?? date;
+  const last = days[0]?.date ?? date;
+  const rows = eachDate(first < date ? first : date, last > date ? last : date)
+    .reverse()
+    .map(
+      (d) =>
+        byDate.get(d) ?? { id: d, date: d, workoutTypeId: null, weight: null, notes: null, entries: [] },
+    );
 
   const session = sessionFor(date, days.find((d) => d.date === date)?.workoutTypeId ?? null);
   const targets = targetsFor(date, blocks, settings);

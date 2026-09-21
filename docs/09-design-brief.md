@@ -71,6 +71,14 @@ database and no search-first flow.
   zero-calorie day.
 - **Never show an "out of range" or "no active block" state.** Any date is
   loggable. Opening the app always offers somewhere to write.
+- **Any past date can be filled in later** (rule R1c). Forgetting to log is
+  normal, whether it's noticed the next morning or three weeks on. Today
+  offers previous/next day and a date picker for jumping further back.
+  Unlogged past days show in the day list as unlogged, never hidden — a
+  silent gap reads as "nothing happened", a visible one as "you didn't log
+  this." Logging into a past date works exactly like today: no special case,
+  no "this day is closed" state. Future dates are reachable but not a
+  priority.
 
 ## Visual direction
 

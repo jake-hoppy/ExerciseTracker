@@ -41,6 +41,25 @@ Never write code that asks "which block is this day in?" as a precondition for
 logging. Blocks are optional labels over date ranges (decision D4) and a day
 belonging to none is the normal case.
 
+## R1c. Any past date can be backfilled
+
+Any past date must be reachable and loggable. Forgetting to log a day is
+normal; the app must let you fill it in later, whether that's the next morning
+or three weeks on. **This is a hard requirement, not a nice-to-have.**
+
+- The Today screen offers date navigation — previous/next day, plus a date
+  picker for jumping further back.
+- Unlogged past days are visible in the day list, shown as unlogged rather
+  than hidden. A silent gap reads as "nothing happened"; a visible one reads
+  as "you didn't log this."
+- Logging into a past date creates its `Day` row exactly as today does (R1b).
+  No special case, no "this day is closed" state.
+- Backfilling repairs the streak automatically — R2 recomputes from logged
+  days, so filling yesterday in today restores the run. Nothing special is
+  needed for this, but don't write code that prevents it.
+
+Future dates are reachable too, but not a priority.
+
 ## R2. Current streak
 
 Walk backward from today counting consecutive logged days. Stop at the first
