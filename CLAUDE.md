@@ -18,7 +18,8 @@ binding, not suggestive.
 
 ## Stack
 
-Next.js (App Router, TypeScript) + Tailwind. Postgres on Neon via Prisma.
+Next.js 16 (App Router, TypeScript) + Tailwind 4. Postgres on Neon via
+Prisma 7 with the Neon driver adapter. Vitest for tests.
 Deployed on Vercel from `main`. No auth in Phase 1; password middleware in
 Phase 2.
 
@@ -26,25 +27,42 @@ Reasoning lives in `docs/01-architecture-decisions.md`, not here.
 
 ## Commands
 
-Fill these in as the project scaffolds. This is the most load-bearing section
-in the file — keep it accurate.
+This is the most load-bearing section in the file — keep it accurate.
 
 ```
-# install
-# dev server
-# typecheck
-# lint
-# test
-# db migrate
-# db seed
+npm install              # also runs prisma generate (postinstall)
+npm run dev              # http://localhost:3000
+npm run typecheck        # next typegen && tsc --noEmit
+npm run lint             # eslint
+npm test                 # vitest run
+npm run build            # prisma generate && next build
+npm run db:migrate       # prisma migrate dev — create + apply a migration
+npm run db:deploy        # prisma migrate deploy — apply only (CI / Vercel)
+npm run db:seed          # load data/seed-block.json; safe to re-run
+npm run db:studio        # browse the database
+node scripts/shot.mjs / name   # screenshots to .shots/ at 1280 + 390 (dev server running)
 ```
+
+Env lives in `.env.local` (gitignored). `DATABASE_URL` is Neon's **pooled**
+Postgres string, used by the app. `DATABASE_URL_UNPOOLED` is the direct one,
+used by Prisma migrations (`prisma.config.ts`). `NEON_DATA_API_URL` is the
+Data API REST endpoint and nothing uses it yet.
+
+Prisma is pinned to 7.10.0 — npm's `latest` tag points at an 8.0 RC. The
+generated client is in `src/generated/prisma` (gitignored); import it
+from `@/generated/prisma/client`, and use `db` from `@/lib/db` in app code.
 
 ## Repo layout
 
 ```
-docs/        Decisions, roadmap, domain rules, design system. Read before building.
-data/        Seed data — the completed 30-day block.
-.claude/     Subagent and command definitions.
+docs/          Decisions, roadmap, domain rules, design system. Read before building.
+data/          Seed data — the completed 30-day block.
+prisma/        Schema, migrations, seed script.
+src/app/       Routes. `/` lists the latest block's days.
+src/lib/       dates (calendar-date helpers), format (all user-visible
+               numbers), totals (day totals from entries), db (Prisma client).
+scripts/       shot.mjs for /verify-ui.
+.claude/       Subagent and command definitions.
 ```
 
 ## How to work here
@@ -92,3 +110,13 @@ needs to pay for itself immediately.
 No auth, no multi-user, no social features, no wearable sync, no meal
 database. Each of these is a project. See `docs/05-research-brief.md` for the
 ones worth investigating later.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
