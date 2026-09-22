@@ -50,6 +50,10 @@ than improvising screens while also building data plumbing.
 **Done when:** you've logged three consecutive real days on your phone without
 opening a laptop. Use it for a week before Phase 3.
 
+> Today screen and food log shipped 2026-09-21 per
+> `docs/superpowers/specs/2026-09-21-today-and-food-log-design.md`.
+> Remaining for Phase 2: block view editable inline, PIN lock.
+
 ## Phase 3 — It tells you something
 
 - Weight chart: raw dailies plus 7-day rolling average, start and goal lines

@@ -31,7 +31,7 @@ export function DateNav({
       >
         ‹
       </Link>
-      <label className="relative flex min-h-11 items-center">
+      <label className="relative flex min-h-11 items-center rounded-card px-2 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-rust">
         <span className="font-mono text-sm text-ink-dim">{label}</span>
         <input
           type="date"
@@ -41,7 +41,7 @@ export function DateNav({
             const v = e.target.value;
             if (isDateString(v)) router.push(routeFor(v));
           }}
-          className="absolute inset-0 cursor-pointer opacity-0"
+          className="absolute inset-0 cursor-pointer opacity-0 focus:outline-none"
         />
       </label>
       <Link

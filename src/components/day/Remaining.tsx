@@ -11,7 +11,7 @@ export function Remaining({ totals, targets }: { totals: Totals; targets: Target
   const prot = remaining(totals.protein, targets.proteinTarget);
 
   return (
-    <section aria-label="Remaining today" className="mt-5">
+    <section aria-label="Remaining today">
       <p className="flex items-baseline justify-between gap-4">
         <Figure r={kcal} unit="" fallback={formatKcal(totals.calories)} verb="left" />
         <Figure r={prot} unit=" g" fallback={formatGrams(totals.protein)} verb="to go" />

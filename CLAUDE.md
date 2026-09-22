@@ -58,11 +58,14 @@ from `@/generated/prisma/client`, and use `db` from `@/lib/db` in app code.
 docs/          Decisions, roadmap, domain rules, design system. Read before building.
 data/          Seed data — the completed 30-day block.
 prisma/        Schema, migrations, seed script.
-src/app/       Routes. `/` shows today and every logged day, newest first.
-src/lib/       dates (calendar-date helpers, today in Mountain time), schedule
-               (workout for any date, target resolution), days (ensureDay),
-               format (all user-visible numbers), totals (day totals from
-               entries), db (Prisma client).
+src/app/       Routes. `/` is Today; `/d/YYYY-MM-DD` any date; `/block` the
+               day list. `actions.ts` holds every server action.
+src/components/day/  The Today screen: DayScreen (server) and the client
+               pieces — DateNav, TrainedToggle, WeightField, NotesField,
+               DayLog (entries + inline items), AddFoodSheet.
+src/lib/       dates, routes (client-safe), schedule, days (ensureDay),
+               day-screen (read model), log (every write), validate (Zod),
+               items, weight, totals, format, db.
 scripts/       shot.mjs for /verify-ui.
 .claude/       Subagent and command definitions.
 ```

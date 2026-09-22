@@ -52,6 +52,7 @@ export function DayLog({
   entries,
   topItems,
   items,
+  isToday,
   targets,
   children,
 }: {
@@ -59,6 +60,7 @@ export function DayLog({
   entries: EntryView[];
   topItems: ItemView[];
   items: ItemView[];
+  isToday: boolean;
   targets: { calTarget: number | null; proteinTarget: number | null };
   children?: React.ReactNode;
 }) {
@@ -118,8 +120,12 @@ export function DayLog({
 
   return (
     <>
-      <Remaining totals={dayTotals(optimistic)} targets={targets} />
-      {children}
+      {/* Continues the header's margin rule (rust = today) through the
+          remaining line and the weight line, per docs/10-today-design.md. */}
+      <div className={`border-l-2 pt-5 pl-3 ${isToday ? "border-l-rust" : "border-l-line"}`}>
+        <Remaining totals={dayTotals(optimistic)} targets={targets} />
+        {children}
+      </div>
 
       {optimistic.length > 0 && (
         <section className="mt-8" aria-label="Logged">

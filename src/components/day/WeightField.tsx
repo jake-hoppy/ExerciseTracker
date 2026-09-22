@@ -74,11 +74,20 @@ export function WeightField({
             type="button"
             onClick={open}
             aria-label="Edit weight"
-            className={`min-h-11 min-w-16 text-left text-lg text-ink ${
+            className={`min-h-11 text-left text-lg text-ink ${
               invalid ? "rounded-card outline-2 outline-rust" : ""
             }`}
           >
-            {formatWeight(shown)}
+            {shown == null ? (
+              // Unset is the 6am state: a blank to fill in, the biggest
+              // target in the header (docs/10-today-design.md).
+              <span
+                aria-hidden
+                className="inline-block h-8 w-20 border-b-2 border-dashed border-ink-faint align-baseline"
+              />
+            ) : (
+              formatWeight(shown)
+            )}
           </button>
         )}
         {avg && (
