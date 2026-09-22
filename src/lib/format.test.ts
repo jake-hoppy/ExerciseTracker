@@ -1,13 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  EMPTY,
-  formatDateRange,
-  formatGrams,
-  formatKcal,
-  formatShortDate,
-  formatWeekday,
-  formatWeight,
-} from "./format";
+import { EMPTY, formatAvgLabel, formatDateRange, formatGrams, formatKcal, formatShortDate, formatWeekday, formatWeight } from "./format";
 
 describe("empty values", () => {
   it("render as a dash, never 0", () => {
@@ -40,5 +32,13 @@ describe("dates", () => {
   it("formats a range", () => {
     expect(formatDateRange("2026-08-13", "2026-09-11")).toBe("Aug 13 – Sep 11, 2026");
     expect(formatDateRange("2026-12-20", "2027-01-18")).toBe("Dec 20, 2026 – Jan 18, 2027");
+  });
+});
+
+describe("formatAvgLabel", () => {
+  it("names the window by how many readings it holds (R4)", () => {
+    expect(formatAvgLabel(7)).toBe("7-day");
+    expect(formatAvgLabel(4)).toBe("4-day");
+    expect(formatAvgLabel(1)).toBe("1-day");
   });
 });

@@ -44,3 +44,8 @@ export function formatDateRange(start: DateString, end: DateString): string {
     ? `${formatShortDate(start)} – ${formatShortDate(end)}, ${ey}`
     : `${formatShortDate(start)}, ${sy} – ${formatShortDate(end)}, ${ey}`;
 }
+
+/** "7-day", or "4-day" when the window is short (rule R4). */
+export function formatAvgLabel(count: number): string {
+  return `${count}-day`;
+}
