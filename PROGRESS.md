@@ -35,9 +35,12 @@ Verification: unit tests for every piece of arithmetic (hand-checked values),
 database tests for every write, `/verify-ui` on `/`, `/unlock` and `/block`
 (cap 4 rounds each), `rules-auditor` on the trailing-average code.
 
-**Phase 2 status: built, verified, committed on `autobuild`. Not pushed,
-not deployed.** Remaining is the human part: deploy, then three real days
-on the phone. Phase 3 not started — this run was scoped to Phase 2.
+**Phase 2 status:** merged to `main` and pushed 2026-09-21.
+
+**Phase 3 status: built, verified, committed on `phase-3`. Not pushed,
+not deployed.** "Is this block working?" is answered by the weight-change
+tile on `/trends` with no arithmetic; the demo data that proved it is
+gone from the database.
 
 ## Phase 3 — plan
 
@@ -161,7 +164,9 @@ reading; when anchored the average doesn't look back past day 1.
 (2) R1's "logged = at least one entry" had no test of its own; extracted
 `statRowFrom` and pinned it. Verified visually with a temporary block
 (start Aug 20, startWeight 185, goal 175): hollow origin, average from
-it, goal hairline; block deleted afterwards. Round two: see below.
+it, goal hairline; block deleted afterwards. Round two: both items PASS; the auditor named
+the one untested path (an anchored day 1 blending into the first week's
+averages) — pinned with a test since.
 
 ### Phase 3 exit criteria (`docs/08-autonomous-run.md`)
 
@@ -177,10 +182,15 @@ it, goal hairline; block deleted afterwards. Round two: see below.
       two readings, not three.
 - [x] Today unlogged does not break the streak — `currentStreak` test
       "skips an unlogged today and starts from yesterday" = 2.
-- [ ] `rules-auditor` clean — round two pending.
+- [x] `rules-auditor` clean — two rounds, second clean.
 - [x] `/verify-ui /trends` passes both widths — two rounds, second clean.
-- [x] `npm test` 109, typecheck, lint, build clean.
-- [ ] Demo data cleared and verified absent — done last.
+- [x] `npm test` 110, typecheck, lint, build clean.
+- [x] Demo data cleared and verified absent — `seed:clear` removed 27
+      days; a query then found 0 days with the demo note, 0 item-less
+      entries before today, 0 temporary blocks, no manifest. Real days
+      untouched: 09-21 (177.2, trained, 2 entries), 09-20 (trained).
+      `/trends` re-shot on real data: "— needs two weigh-ins", one dot,
+      one column — the empty states the reviewer couldn't see.
 
 ## Phase 2 — log
 

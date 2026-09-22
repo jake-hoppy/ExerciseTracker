@@ -235,3 +235,14 @@ describe("anchorAtStart (R4)", () => {
     expect(anchorAtStart([], 185.0)).toEqual({ rows: [], anchored: false });
   });
 });
+
+describe("anchor feeding the rolling average (R4, integration)", () => {
+  it("treats the anchored day 1 as the origin the first week's averages blend from", () => {
+    const rows = [row("2026-09-01"), row("2026-09-02", { weight: 183.0 })];
+    const { rows: anchored } = anchorAtStart(rows, 185.0);
+    expect(rollingAverageSeries(anchored)).toEqual([
+      { date: "2026-09-01", average: 185.0, count: 1 },
+      { date: "2026-09-02", average: 184.0, count: 2 },
+    ]);
+  });
+});
