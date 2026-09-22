@@ -3,6 +3,7 @@
 // calendar date; a date with no row is unlogged (rule R1c).
 
 import { addDays, type DateString } from "./dates";
+import { dayTotals } from "./totals";
 import { trailingAverage } from "./weight";
 
 export type StatRow = {
@@ -16,6 +17,42 @@ export type StatRow = {
 };
 
 export type AveragePoint = { date: DateString; average: number | null; count: number };
+
+/**
+ * One row from a Day (or none). Logged means at least one entry (rule R1);
+ * totals derive from entries and are null when there are none (R6c, R6).
+ */
+export function statRowFrom(
+  date: DateString,
+  day: { weight: number | null; trained: boolean; entries: { calories: number; protein: number }[] } | null,
+  isRest: boolean,
+): StatRow {
+  const totals = dayTotals(day?.entries ?? []);
+  return {
+    date,
+    logged: (day?.entries.length ?? 0) > 0,
+    calories: totals.calories,
+    protein: totals.protein,
+    weight: day?.weight ?? null,
+    trained: day?.trained ?? false,
+    isRest,
+  };
+}
+
+/**
+ * Rule R4: if the block has a startWeight and day 1 has no reading, anchor
+ * the series at day 1 with the start weight so the line has an origin. A
+ * real day-1 reading supersedes the anchor; never both.
+ */
+export function anchorAtStart(
+  rows: readonly StatRow[],
+  startWeight: number | null,
+): { rows: StatRow[]; anchored: boolean } {
+  if (rows.length === 0 || startWeight === null || rows[0].weight !== null) {
+    return { rows: [...rows], anchored: false };
+  }
+  return { rows: [{ ...rows[0], weight: startWeight }, ...rows.slice(1)], anchored: true };
+}
 
 /**
  * Rule R2: consecutive logged days ending today. If today isn't logged

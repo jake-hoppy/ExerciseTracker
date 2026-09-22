@@ -61,7 +61,7 @@ export default async function TrendsPage() {
             <span><span className="mr-1 inline-block h-px w-4 bg-ink align-middle" />daily</span>
           </p>
         </div>
-        <WeightChart rows={t.rows} series={t.series} startWeight={t.block?.startWeight ?? null} goalWeight={t.block?.goalWeight ?? null} />
+        <WeightChart rows={t.rows} series={t.series} anchored={t.anchored} goalWeight={t.block?.goalWeight ?? null} />
       </section>
 
       <section aria-label="Calories" className="mt-10">

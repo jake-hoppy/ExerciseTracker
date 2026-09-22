@@ -6,17 +6,18 @@ import { addDays, eachDate, today, type DateString } from "./dates";
 import { db } from "./db";
 import { blocksCovering, targetsFor, workoutTypeIdFor } from "./schedule";
 import {
+  anchorAtStart,
   completion,
   currentStreak,
   longestStreak,
   mean,
   rollingAverageSeries,
+  statRowFrom,
   weightDelta,
   type AveragePoint,
   type Completion,
   type StatRow,
 } from "./stats";
-import { dayTotals } from "./totals";
 
 export type TrendsData = {
   today: DateString;
@@ -25,6 +26,8 @@ export type TrendsData = {
   targets: { calTarget: number | null; proteinTarget: number | null };
   rows: StatRow[];
   series: AveragePoint[];
+  // Day 1 carries the block's startWeight because it had no reading (R4).
+  anchored: boolean;
   stats: {
     currentStreak: number;
     longestStreak: number;
@@ -44,7 +47,7 @@ export async function loadTrends(): Promise<TrendsData> {
   ]);
   const covering = blocksCovering(now, blocks)[0] ?? null;
   const start = covering ? covering.startDate : addDays(now, -29);
-  const end = covering?.endDate && covering.endDate < now ? covering.endDate : now;
+  const end = now; // a covering block by definition includes today
 
   // The average needs the week before the range too (rule R4).
   const days = await db.day.findMany({
@@ -61,24 +64,15 @@ export async function loadTrends(): Promise<TrendsData> {
   const typeById = new Map(types.map((t) => [t.id, t]));
 
   const toRow = (date: DateString): StatRow => {
-    const d = byDate.get(date);
+    const d = byDate.get(date) ?? null;
     const typeId = settings && workoutTypeIdFor(date, settings, d?.workoutTypeId ?? null);
-    const session = typeId ? typeById.get(typeId) : undefined;
-    const totals = dayTotals(d?.entries ?? []);
-    return {
-      date,
-      logged: (d?.entries.length ?? 0) > 0,
-      calories: totals.calories,
-      protein: totals.protein,
-      weight: d?.weight ?? null,
-      trained: d?.trained ?? false,
-      isRest: session?.isRest ?? false,
-    };
+    return statRowFrom(date, d, typeId ? (typeById.get(typeId)?.isRest ?? false) : false);
   };
 
-  const rows = eachDate(start, end).map(toRow);
-  const withLead = eachDate(addDays(start, -6), end).map(toRow);
-  const series = rollingAverageSeries(withLead).filter((p) => p.date >= start);
+  const lead = eachDate(addDays(start, -6), addDays(start, -1)).map(toRow);
+  const { rows, anchored } = anchorAtStart(eachDate(start, end).map(toRow), covering?.startWeight ?? null);
+  // The anchor is day 1's origin, so the average must not look further back.
+  const series = rollingAverageSeries(anchored ? rows : [...lead, ...rows]).filter((p) => p.date >= start);
   const targets = targetsFor(now, blocks, settings);
   const loggedRows = rows.filter((r) => r.logged);
 
@@ -91,6 +85,7 @@ export async function loadTrends(): Promise<TrendsData> {
     targets,
     rows,
     series,
+    anchored,
     stats: {
       currentStreak: currentStreak(rows, now),
       longestStreak: longestStreak(rows),

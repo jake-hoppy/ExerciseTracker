@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  anchorAtStart,
   completion,
   currentStreak,
   longestStreak,
   mean,
   rollingAverageSeries,
+  statRowFrom,
   weightDelta,
   type StatRow,
 } from "./stats";
@@ -197,5 +199,39 @@ describe("weightDelta (R4)", () => {
     expect(weightDelta([{ date: "2026-09-21", average: null, count: 0 }], null)).toBeNull();
     expect(weightDelta([{ date: "2026-09-21", average: 178.5, count: 3 }], null)).toBeNull();
     expect(weightDelta([], 180)).toBeNull();
+  });
+});
+
+describe("statRowFrom (R1, R6c)", () => {
+  it("is logged only when the day has at least one entry, and totals derive from entries", () => {
+    expect(statRowFrom("2026-09-21", null, false)).toEqual(row("2026-09-21"));
+    expect(statRowFrom("2026-09-21", { weight: 178.2, trained: true, entries: [] }, true)).toEqual(
+      row("2026-09-21", { weight: 178.2, trained: true, isRest: true }),
+    );
+    expect(
+      statRowFrom("2026-09-21", { weight: null, trained: false, entries: [{ calories: 751, protein: 54 }] }, false),
+    ).toEqual(logged("2026-09-21", { calories: 751, protein: 54 }));
+  });
+});
+
+describe("anchorAtStart (R4)", () => {
+  const w = (date: string, weight: number | null) => row(date, { weight });
+
+  it("anchors day 1 at startWeight when day 1 has no reading", () => {
+    const out = anchorAtStart([w("2026-09-01", null), w("2026-09-02", 183.0)], 185.0);
+    expect(out.anchored).toBe(true);
+    expect(out.rows[0]).toEqual(w("2026-09-01", 185.0));
+    expect(out.rows[1]).toEqual(w("2026-09-02", 183.0));
+  });
+
+  it("leaves a real day-1 reading alone — never both", () => {
+    const rows = [w("2026-09-01", 183.4), w("2026-09-02", 183.0)];
+    expect(anchorAtStart(rows, 185.0)).toEqual({ rows, anchored: false });
+  });
+
+  it("does nothing without a startWeight or without rows", () => {
+    const rows = [w("2026-09-01", null)];
+    expect(anchorAtStart(rows, null)).toEqual({ rows, anchored: false });
+    expect(anchorAtStart([], 185.0)).toEqual({ rows: [], anchored: false });
   });
 });

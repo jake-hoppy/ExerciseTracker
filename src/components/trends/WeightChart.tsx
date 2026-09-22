@@ -7,19 +7,18 @@ import { DESKTOP, PHONE, ticks, tickIndexes, xScale, yScale, type Layout } from 
 export function WeightChart({
   rows,
   series,
-  startWeight,
+  anchored,
   goalWeight,
 }: {
   rows: StatRow[];
   series: AveragePoint[];
-  startWeight: number | null;
+  anchored: boolean; // day 1 is the block's startWeight, not a reading (R4)
   goalWeight: number | null;
 }) {
   const readings = rows.map((r) => r.weight);
   const values = [
     ...readings.filter((v): v is number => v !== null),
     ...series.map((p) => p.average).filter((v): v is number => v !== null),
-    ...(startWeight !== null ? [startWeight] : []),
     ...(goalWeight !== null ? [goalWeight] : []),
   ];
   if (values.length === 0) {
@@ -30,8 +29,8 @@ export function WeightChart({
 
   return (
     <>
-      <Drawing layout={PHONE} className="sm:hidden" {...{ rows, series, startWeight, goalWeight, min, max }} />
-      <Drawing layout={DESKTOP} className="hidden sm:block" {...{ rows, series, startWeight, goalWeight, min, max }} />
+      <Drawing layout={PHONE} className="sm:hidden" {...{ rows, series, anchored, goalWeight, min, max }} />
+      <Drawing layout={DESKTOP} className="hidden sm:block" {...{ rows, series, anchored, goalWeight, min, max }} />
     </>
   );
 }
@@ -41,7 +40,7 @@ function Drawing({
   className,
   rows,
   series,
-  startWeight,
+  anchored,
   goalWeight,
   min,
   max,
@@ -50,7 +49,7 @@ function Drawing({
   className: string;
   rows: StatRow[];
   series: AveragePoint[];
-  startWeight: number | null;
+  anchored: boolean;
   goalWeight: number | null;
   min: number;
   max: number;
@@ -84,14 +83,6 @@ function Drawing({
           </text>
         </g>
       ))}
-      {startWeight !== null && (
-        <g>
-          <line x1={l.left} x2={l.width - l.right} y1={y(startWeight)} y2={y(startWeight)} stroke="var(--color-ink-faint)" strokeWidth={1} strokeDasharray="2 3" />
-          <text x={l.width - l.right} y={y(startWeight) - 4} textAnchor="end" fill="var(--color-ink-faint)" paintOrder="stroke" stroke="var(--color-bg)" strokeWidth={4}>
-            start {formatWeight(startWeight)}
-          </text>
-        </g>
-      )}
       {goalWeight !== null && (
         <g>
           <line x1={l.left} x2={l.width - l.right} y1={y(goalWeight)} y2={y(goalWeight)} stroke="var(--color-rust)" strokeWidth={1} />
@@ -102,7 +93,18 @@ function Drawing({
       )}
       <path d={path(rawPts)} fill="none" stroke="var(--color-ink)" strokeWidth={1} strokeOpacity={0.7} strokeLinejoin="round" />
       {rawPts.map((p, i) =>
-        p === null ? null : (
+        p === null ? null : anchored && i === 0 ? (
+          // The origin is the block's start weight, drawn hollow so it never
+          // reads as a weigh-in (rule R4).
+          <g key={i}>
+            <circle cx={p[0]} cy={p[1]} r={3.5} fill="var(--color-bg)" stroke="var(--color-ink-faint)" strokeWidth={1.5}>
+              <title>{`${formatShortDate(rows[i].date)}: start weight ${formatWeight(rows[i].weight)} lb`}</title>
+            </circle>
+            <text x={p[0] + 6} y={p[1] - 6} fill="var(--color-ink-faint)" paintOrder="stroke" stroke="var(--color-bg)" strokeWidth={4}>
+              start {formatWeight(rows[i].weight)}
+            </text>
+          </g>
+        ) : (
           <circle key={i} cx={p[0]} cy={p[1]} r={2.5} fill="var(--color-ink)" stroke="var(--color-bg)" strokeWidth={1.5}>
             <title>{`${formatShortDate(rows[i].date)}: ${formatWeight(rows[i].weight)} lb`}</title>
           </circle>
