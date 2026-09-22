@@ -32,6 +32,7 @@ export async function DayScreen({ date }: { date: string }) {
         date={date}
         entries={data.entries}
         topItems={data.topItems}
+        items={data.items}
         targets={data.targets}
       >
         <WeightField date={date} weight={data.day?.weight ?? null} avg={data.weightAvg} />

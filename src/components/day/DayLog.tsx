@@ -9,6 +9,7 @@ import {
 } from "@/app/actions";
 import type { EntryView, ItemView } from "@/lib/day-screen";
 import { dayTotals } from "@/lib/totals";
+import { AddFoodSheet } from "./AddFoodSheet";
 import { EntryRow } from "./EntryRow";
 import { ItemRow } from "./ItemRow";
 import { Remaining } from "./Remaining";
@@ -50,18 +51,21 @@ export function DayLog({
   date,
   entries,
   topItems,
+  items,
   targets,
   children,
 }: {
   date: string;
   entries: EntryView[];
   topItems: ItemView[];
+  items: ItemView[];
   targets: { calTarget: number | null; proteinTarget: number | null };
   children?: React.ReactNode;
 }) {
   const [optimistic, dispatch] = useOptimistic(entries as OptimisticEntry[], reduce);
   const [, startTransition] = useTransition();
   const [retry, setRetry] = useState<(() => void) | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const run = (a: Action, fn: () => Promise<void>) => {
     const attempt = () =>
@@ -106,7 +110,6 @@ export function DayLog({
       },
       () => quickAddAction(date, input),
     );
-  void quickAdd; // used by AddFoodSheet in Task 7
 
   const edit = (id: string, n: { calories: number; protein: number }) =>
     run({ type: "edit", id, ...n }, () => updateEntryAction(date, id, n));
@@ -137,6 +140,22 @@ export function DayLog({
             <ItemRow key={i.id} item={i} onLog={log} />
           ))}
         </ul>
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
+          className="flex min-h-11 w-full items-center justify-between border-b border-line-soft pl-7 font-mono text-sm text-ink-dim"
+        >
+          <span>All items and quick add</span>
+          <span className="pr-4 text-lg">›</span>
+        </button>
+        <AddFoodSheet
+          date={date}
+          open={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          items={items}
+          onLog={log}
+          onQuickAdd={quickAdd}
+        />
       </section>
     </>
   );
