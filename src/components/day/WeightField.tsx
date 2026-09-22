@@ -12,10 +12,13 @@ export function WeightField({
   date,
   weight,
   avg,
+  compact = false,
 }: {
   date: string;
   weight: number | null;
   avg: { average: number; count: number } | null;
+  // The block view's rows: just the number, no caption, no average.
+  compact?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
@@ -51,9 +54,9 @@ export function WeightField({
   };
 
   return (
-    <div className="mt-3">
+    <div className={compact ? "" : "mt-3"}>
       <p className="flex min-h-11 items-center gap-3 font-mono text-sm text-ink-dim tabular-nums">
-        <span className="label">Weight</span>
+        {!compact && <span className="label">Weight</span>}
         {editing ? (
           <input
             autoFocus
@@ -67,14 +70,16 @@ export function WeightField({
               if (e.key === "Escape") setEditing(false);
             }}
             aria-label="Weight in pounds"
-            className="w-24 rounded-card border border-line bg-bg-alt px-2 py-1 text-lg text-ink"
+            className={`rounded-card border border-line bg-bg-alt px-2 py-1 text-ink ${
+              compact ? "w-full text-right text-sm" : "w-24 text-lg"
+            }`}
           />
         ) : (
           <button
             type="button"
             onClick={open}
             aria-label="Edit weight"
-            className={`min-h-11 text-left text-lg text-ink ${
+            className={`min-h-11 text-ink ${compact ? "w-full text-right text-sm" : "text-left text-lg"} ${
               invalid ? "rounded-card outline-2 outline-rust" : ""
             }`}
           >
@@ -83,7 +88,9 @@ export function WeightField({
               // target in the header (docs/10-today-design.md).
               <span
                 aria-hidden
-                className="inline-block h-8 w-20 border-b-2 border-dashed border-ink-faint align-baseline"
+                className={`inline-block border-b-2 border-dashed border-ink-faint align-baseline ${
+                  compact ? "h-4 w-8" : "h-8 w-20"
+                }`}
               />
             ) : (
               formatWeight(shown)

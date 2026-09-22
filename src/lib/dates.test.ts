@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, daysBetween, eachDate, isDateString, today, weekdayIndex } from "./dates";
+import { addDays, daysBetween, eachDate, isDateString, spanRows, today, weekdayIndex } from "./dates";
 
 describe("isDateString", () => {
   it("accepts real calendar dates", () => {
@@ -74,5 +74,33 @@ describe("today", () => {
     const lateEvening = new Date("2026-09-22T04:30:00Z");
     expect(today("America/Denver", lateEvening)).toBe("2026-09-21");
     expect(today("UTC", lateEvening)).toBe("2026-09-22");
+  });
+});
+
+describe("spanRows", () => {
+  const blank = (date: string) => ({ date, logged: false });
+
+  it("fills every date from the earliest row through the end, keeping real rows (R1c)", () => {
+    const rows = [
+      { date: "2026-09-19", logged: true },
+      { date: "2026-09-21", logged: true },
+    ];
+    expect(spanRows(rows, "2026-09-22", blank)).toEqual([
+      { date: "2026-09-19", logged: true },
+      { date: "2026-09-20", logged: false },
+      { date: "2026-09-21", logged: true },
+      { date: "2026-09-22", logged: false },
+    ]);
+  });
+
+  it("still includes rows after the end date", () => {
+    const rows = [{ date: "2026-09-25", logged: true }];
+    expect(spanRows(rows, "2026-09-21", blank).map((r) => r.date)).toEqual([
+      "2026-09-21", "2026-09-22", "2026-09-23", "2026-09-24", "2026-09-25",
+    ]);
+  });
+
+  it("is just the end date when there are no rows", () => {
+    expect(spanRows([], "2026-09-21", blank)).toEqual([{ date: "2026-09-21", logged: false }]);
   });
 });

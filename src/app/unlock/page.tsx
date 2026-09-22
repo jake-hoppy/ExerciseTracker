@@ -8,6 +8,7 @@ export default async function UnlockPage(props: PageProps<"/unlock">) {
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-4">
+      <p className="mb-8 font-display text-xl font-semibold tracking-wide text-ink-dim">Training log</p>
       <p className="label mb-6">Enter PIN</p>
       <PinForm from={target} />
     </main>

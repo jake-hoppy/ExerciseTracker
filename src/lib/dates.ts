@@ -67,3 +67,20 @@ export function today(timeZone = HOME_TIME_ZONE, now = new Date()): DateString {
     day: "2-digit",
   }).format(now);
 }
+
+/**
+ * Every date from the earliest row through `end` (or the latest row, if
+ * later), in order, with `blank(date)` standing in for dates that have no
+ * row. A missed day shows as missed, never as a silent gap (rule R1c).
+ */
+export function spanRows<T extends { date: DateString }>(
+  rows: readonly T[],
+  end: DateString,
+  blank: (date: DateString) => T,
+): T[] {
+  const byDate = new Map(rows.map((r) => [r.date, r]));
+  const dates = [...byDate.keys()].sort();
+  const first = dates[0] && dates[0] < end ? dates[0] : end;
+  const last = dates.at(-1) && dates.at(-1)! > end ? dates.at(-1)! : end;
+  return eachDate(first, last).map((d) => byDate.get(d) ?? blank(d));
+}
