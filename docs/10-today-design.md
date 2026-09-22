@@ -56,7 +56,7 @@ system's "today" encoding), which turns `--line` on any other date.
 │‖ 1,109 left           24 g to go     │  Oswald, parchment
 │‖ ───────────────────────────────     │  1px rule: the ledger sum line
 │‖ 991 of 2,100          126 of 150    │  mono, ink-dim
-│‖ Weight 178.2   7-day 178.9          │  mono; tap the number
+│‖ Weight 178.9 7-day avg  reading 178.2│  average leads (R4); tap the reading
 ├──────────────────────────────────────┤
 │ Logged                               │  label
 │ ✓ Konala chicken burrito bowl 751 54 │  serif name, mono cols, moss tick
@@ -116,10 +116,15 @@ the system's `.label`; nothing else in the sheet is uppercase.
   size, no other change. A 1px rule beneath, then the totals line in mono
   `--ink-dim`: `991 of 2,100` and `126 of 150`. "of", not a slash — it's a
   sentence, not a fraction.
-- **Weight** — one mono line: `Weight` as a `.label`, the reading at 18px
-  `--ink`, then the average in `--ink-dim` with its window: `7-day 178.9`.
-  Tapping the reading swaps in a 6-character decimal input, same size, same
-  place. An invalid entry gets the rust outline and keeps the old value.
+- **Weight** — one mono line: `Weight` as a `.label`, then the rolling
+  average at 18px `--ink` with its window (`7-day avg`, or `3-day avg`
+  when short), then `reading` and the raw figure. The average leads
+  because rule R4 says every weight figure does; the raw reading is the
+  thing you type, so the tap target is on it. With no readings in the
+  window, the raw reading stands alone. Tapping the reading swaps in a
+  6-character decimal input, same size, same place; unset, it is a dashed
+  blank — the biggest target in the header at 6am. An invalid entry gets
+  the rust outline and keeps the old value.
 - **Logged rows** — serif name, truncated; mono kcal and protein
   right-aligned; `✕`. Tapping the name area expands the row in place to two
   mono inputs and `Done`. Pending rows (optimistic) are at 60% opacity.
