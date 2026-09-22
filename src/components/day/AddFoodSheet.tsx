@@ -33,7 +33,7 @@ export function AddFoodSheet({
   const [editing, setEditing] = useState<ItemView | "new" | null>(null);
   const [quickKey, setQuickKey] = useState(0);
   const [failed, setFailed] = useState<(() => void) | null>(null);
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const d = dialog.current;
@@ -91,6 +91,7 @@ export function AddFoodSheet({
           <ItemForm
             key={quickKey}
             submitLabel="Log"
+            pending={isPending}
             onSubmit={(v) => {
               onQuickAdd({
                 calories: v.calories,
@@ -127,6 +128,7 @@ export function AddFoodSheet({
                     requireName
                     showSave={false}
                     submitLabel="Save"
+                    pending={isPending}
                     onSubmit={(v) => saveItem(v, item.id)}
                     onCancel={() => setEditing(null)}
                   />
@@ -166,6 +168,7 @@ export function AddFoodSheet({
               requireName
               showSave={false}
               submitLabel="Save"
+              pending={isPending}
               onSubmit={(v) => saveItem(v)}
               onCancel={() => setEditing(null)}
             />

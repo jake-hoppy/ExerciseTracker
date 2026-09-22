@@ -36,12 +36,16 @@ export function WeightField({
   const save = (raw: string) => {
     setEditing(false);
     const cleaned = raw.trim().replace(",", ".");
-    if (cleaned !== "" && !Number.isFinite(Number(cleaned))) {
+    const n = cleaned === "" ? null : Math.round(Number(cleaned) * 10) / 10;
+    // Same bounds as weightSchema; an out-of-range number never submits.
+    if (n !== null && !(Number.isFinite(n) && n >= 50 && n <= 500)) {
       setInvalid(true);
       return;
     }
+    setInvalid(false);
+    if (n === shown) return; // nothing changed: no write, no Day row
     const previous = shown;
-    setShown(cleaned === "" ? null : Math.round(Number(cleaned) * 10) / 10);
+    setShown(n);
     setFailed(null);
     startTransition(async () => {
       try {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, daysBetween, eachDate, isDateString, spanRows, today, weekdayIndex } from "./dates";
+import { addDays, daysBetween, eachDate, isDateString, spanRows, staleDate, today, weekdayIndex } from "./dates";
 
 describe("isDateString", () => {
   it("accepts real calendar dates", () => {
@@ -102,5 +102,12 @@ describe("spanRows", () => {
 
   it("is just the end date when there are no rows", () => {
     expect(spanRows([], "2026-09-21", blank)).toEqual([{ date: "2026-09-21", logged: false }]);
+  });
+});
+
+describe("staleDate", () => {
+  it("is stale when the page's date is no longer today", () => {
+    expect(staleDate("2026-09-21", "2026-09-22")).toBe(true);
+    expect(staleDate("2026-09-21", "2026-09-21")).toBe(false);
   });
 });

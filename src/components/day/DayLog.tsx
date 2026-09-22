@@ -7,6 +7,7 @@ import {
   removeEntryAction,
   updateEntryAction,
 } from "@/app/actions";
+import { pendingId } from "@/lib/client-ids";
 import type { EntryView, ItemView } from "@/lib/day-screen";
 import { dayTotals } from "@/lib/totals";
 import { AddFoodSheet } from "./AddFoodSheet";
@@ -88,7 +89,7 @@ export function DayLog({
       {
         type: "add",
         entry: {
-          id: `pending-${crypto.randomUUID()}`,
+          id: pendingId(),
           name: item.name,
           calories: item.calories,
           protein: item.protein,
@@ -103,7 +104,7 @@ export function DayLog({
       {
         type: "add",
         entry: {
-          id: `pending-${crypto.randomUUID()}`,
+          id: pendingId(),
           name: input.name ?? null,
           calories: input.calories,
           protein: input.protein,

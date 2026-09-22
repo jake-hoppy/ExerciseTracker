@@ -4,6 +4,7 @@ import { TrainedToggle } from "@/components/day/TrainedToggle";
 import { WeightField } from "@/components/day/WeightField";
 import { loadBlockScreen } from "@/lib/block-screen";
 import { formatGrams, formatKcal, formatShortDate, formatWeekday } from "@/lib/format";
+import { today } from "@/lib/dates";
 import { routeFor } from "@/lib/routes";
 
 // Every day, grouped by month, newest first. Weight and trained edit in
@@ -12,6 +13,7 @@ import { routeFor } from "@/lib/routes";
 export default async function BlockPage() {
   await connection();
   const groups = await loadBlockScreen();
+  const now = today();
 
   return (
     <main className="mx-auto max-w-2xl px-4 pt-4 pb-16">
@@ -39,7 +41,13 @@ export default async function BlockPage() {
               <li
                 key={r.date}
                 className={`grid min-h-11 grid-cols-[3.5rem_minmax(0,1fr)_3.25rem_3rem_2.25rem_2.75rem] gap-x-1.5 sm:grid-cols-[4.5rem_minmax(0,1fr)_4rem_3.5rem_3rem_2.75rem] sm:gap-x-3 items-center border-l-2 pl-1.5 ${
-                  r.logged ? "border-l-moss" : r.isRest ? "border-l-ink-faint" : "border-l-transparent"
+                  r.date === now
+                    ? "border-l-rust"
+                    : r.logged
+                      ? "border-l-moss"
+                      : r.isRest
+                        ? "border-l-ink-faint"
+                        : "border-l-transparent"
                 }`}
               >
                 <Link

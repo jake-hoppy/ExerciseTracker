@@ -84,3 +84,8 @@ export function spanRows<T extends { date: DateString }>(
   const last = dates.at(-1) && dates.at(-1)! > end ? dates.at(-1)! : end;
   return eachDate(first, last).map((d) => byDate.get(d) ?? blank(d));
 }
+
+/** True when a page rendered for `rendered` is being looked at on a later day. */
+export function staleDate(rendered: DateString, now: DateString): boolean {
+  return rendered !== now;
+}
