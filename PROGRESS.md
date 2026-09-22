@@ -140,6 +140,48 @@ native `<title>`s and `/block` is the table view. Noted in SUGGESTIONS.md.
 
 Linked from Today's footer and the block view header.
 
+### Verifiers
+
+**`/verify-ui /trends`** round one: one defect — the "target" label sat on
+the target line at the right edge, where an over-target column near today
+ran through it (a structural collision, not a demo artefact). Fixed: the
+label sits above the plot at the top-right with a rust key; the y scale
+keeps 8% headroom so no column reaches it. Round two: fix confirmed at
+both widths, no other defects; the reviewer noted the empty states
+("No weigh-ins in this range" / "Nothing logged in this range") weren't
+in the screenshots — checked separately after `seed:clear`, below.
+
+**`rules-auditor`** round one: R2, R3, R4 (numeric), R5, R6, R6c, R7 PASS
+with every expected value re-derived by hand. Two findings: (1) R4's
+chart anchor wasn't implemented — the start weight drew as a full-width
+line regardless of whether day 1 had a reading; fixed with
+`anchorAtStart` (tested three ways) so day 1 becomes the origin only when
+it has no reading, drawn as a hollow ring, never alongside a real
+reading; when anchored the average doesn't look back past day 1.
+(2) R1's "logged = at least one entry" had no test of its own; extracted
+`statRowFrom` and pinned it. Verified visually with a temporary block
+(start Aug 20, startWeight 185, goal 175): hollow origin, average from
+it, goal hairline; block deleted afterwards. Round two: see below.
+
+### Phase 3 exit criteria (`docs/08-autonomous-run.md`)
+
+- [x] Stats tests cover R1 (`statRowFrom`), R2 (`currentStreak`), R3
+      (`longestStreak`), R4 (`rollingAverageSeries`, `weightDelta`,
+      `anchorAtStart`), R5 (`completion`), R6 (`mean`, null exclusion),
+      R6c (`statRowFrom` totals from entries; `dayTotals`).
+- [x] Rolling average uses a 7-calendar-day window — test "uses 7 calendar
+      days, not the last 7 readings": five readings in the window average
+      179.38; the last seven readings average 180.7.
+- [x] A null day does not pull the average down — `mean([2100, null,
+      2300]) = 2200`; `rollingAverageSeries` with a null weight day counts
+      two readings, not three.
+- [x] Today unlogged does not break the streak — `currentStreak` test
+      "skips an unlogged today and starts from yesterday" = 2.
+- [ ] `rules-auditor` clean — round two pending.
+- [x] `/verify-ui /trends` passes both widths — two rounds, second clean.
+- [x] `npm test` 109, typecheck, lint, build clean.
+- [ ] Demo data cleared and verified absent — done last.
+
 ## Phase 2 — log
 
 ### 1. Today screen + food log — built
