@@ -72,6 +72,10 @@ Pick from these based on what Phases 2–3 made you want. Don't build all of it.
 - PWA: installable, offline logging, background sync
 - Public read-only summary for the website (see decision D2)
 - Integrations — only after the research in `docs/05-research-brief.md`
+- Optional: a single evening "nothing logged yet" nudge, sent only when the
+  day is still unlogged. No other notifications — per Q7 in
+  `docs/05-research-brief.md`, the lever is making the app fast to reopen,
+  not reminding harder. Not building it now.
 
 ---
 
