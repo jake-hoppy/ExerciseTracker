@@ -35,6 +35,10 @@ Verification: unit tests for every piece of arithmetic (hand-checked values),
 database tests for every write, `/verify-ui` on `/`, `/unlock` and `/block`
 (cap 4 rounds each), `rules-auditor` on the trailing-average code.
 
+**Phase 2 status: built, verified, committed on `autobuild`. Not pushed,
+not deployed.** Remaining is the human part: deploy, then three real days
+on the phone. Phase 3 not started — this run was scoped to Phase 2.
+
 ## Phase 2 — log
 
 ### 1. Today screen + food log — built
@@ -141,8 +145,11 @@ R1b/R1c all PASS on the math and the date flow, with one FAIL — the
 weight line led with the raw reading, not the average (R4). `docs/10`
 had drawn it that way. Fixed (`e24595b`) and the doc corrected. The audit
 also caught a test that couldn't fail (overlapping-block protein 150 ==
-settings 150) — re-pinned with 175. Round two: pending at time of writing;
-result appended below.
+settings 150) — re-pinned with 175. Round two: PASS on all three items
+(average leads with its window stated; the raw reading alone when there is
+no window; the overlap test can now actually fail). The auditor agreed the
+block table's per-day raw column is the raw series, not a headline, so R4
+doesn't apply there.
 
 ### Phase 2 exit criteria (`docs/08-autonomous-run.md`)
 
