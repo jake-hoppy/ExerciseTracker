@@ -17,6 +17,26 @@ acted on. Read this first.
   says long-press. The plan deviates because long-press has no keyboard
   path and nothing on screen reveals it. If you'd rather have long-press as
   well, it's an addition, not a swap.
+## During the Phase 2 run
+
+- **`docs/06-pin-lock.md` is written for `middleware.ts`.** Next 16
+  deprecated that name; the gate is `src/proxy.ts` exporting `proxy`,
+  same logic. Worth updating the doc so the next reader doesn't create a
+  deprecated file. The same doc's `/api/unlock` snippet is what shipped,
+  with the rate limiter and constant-time compare pulled into
+  `src/lib/pin.ts` so they could be unit tested.
+- **The rate limiter keys all localhost traffic as one address** (no
+  `x-forwarded-for` in dev), so five wrong PINs from any local test lock
+  the dev server's `/api/unlock` for a minute. Fine in production behind
+  Vercel's proxy; just something to know when testing locally.
+- **Unlock screen: no length hint in the empty field.** The reviewer
+  suggested a faint `– – – –` placeholder. Left out because docs/06 says
+  one plain input; add it if the 6am you ever hesitates there.
+- **Block view edits weight and trained inline; entries and notes go
+  through the day page.** The roadmap says "editable inline" without
+  saying which fields. Inline entry editing in a dense table would mean
+  the whole food sheet per row; the date link is one tap away instead.
+  If that's not what you meant by inline, say so.
 - **Research Q1 vs Q2 disagree on iOS Shortcuts reliability.** Q1 recommends
   a weigh-in Shortcut; Q2 warns time-of-day automations fail silently. A
   note under Q1 reconciles them (run it on tap/unlock, not on a timer), but

@@ -76,3 +76,35 @@ row.
 178.2, trained, and a note; 09-19 and 09-20 have weights — entered
 through the UI as the first real use. Test rows used dates in January
 2000 and were deleted.
+
+### 2. PIN lock — built
+
+`src/proxy.ts` (Next 16's name for middleware), `src/app/api/unlock/route.ts`,
+`src/app/unlock/page.tsx` + `PinForm`, with the constant-time compare and
+attempt limiter in `src/lib/pin.ts` under 5 unit tests (lockout at the
+fifth failure, countdown, reopen, per-key isolation).
+
+Checked with Playwright against the dev server: no cookie → `/` redirects
+to `/unlock?from=%2F…`; the right PIN sets an `httpOnly` cookie that does
+not contain the PIN and lands on the requested date; five wrong PINs each
+say "Incorrect PIN." and the sixth attempt, even with the right PIN, gets
+"Too many attempts. Try again in 60s." `git grep` for the literal values
+of `APP_PIN` and `SESSION_SECRET` finds nothing tracked (the names appear
+only as `process.env.*` and in docs). `scripts/shot.mjs` now sends the
+session cookie so `/verify-ui` renders behind the gate; `--locked` skips it.
+
+`/verify-ui /unlock`: one round, passed; polish notes only (app name — added;
+a length hint in the field — not added, see SUGGESTIONS.md).
+
+### 3. Block view — built
+
+`/block` lists every date from the first Day through today (`spanRows`,
+tested: gaps become unlogged rows, R1c), grouped by month newest first
+(`groupByMonth`, tested). Weight and trained edit inline via the Today
+components in a compact mode; the date links to `/d/<date>`. Playwright:
+editing Sep 18's weight and trained from the list survived a reload; the
+link went to `/d/2026-09-18`; the test edits were reverted.
+
+First 390px render had the session column squeezed to zero by fixed
+columns and a full-width Trained stamp per row — fixed with a tighter
+grid and a 44px tick-only toggle. `/verify-ui /block`: in progress.
