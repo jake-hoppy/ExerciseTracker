@@ -15,3 +15,15 @@ export function dayTotals(
   }
   return { calories, protein };
 }
+
+export type Remaining =
+  | { kind: "left"; amount: number }
+  | { kind: "over"; amount: number }
+  | { kind: "none" };
+
+/** What's left against a target. No target means nothing to say (rule R6b). */
+export function remaining(total: number | null, target: number | null): Remaining {
+  if (target == null) return { kind: "none" };
+  const diff = target - (total ?? 0);
+  return diff >= 0 ? { kind: "left", amount: diff } : { kind: "over", amount: -diff };
+}
