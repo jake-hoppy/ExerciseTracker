@@ -89,7 +89,10 @@ function Drawing({
       {target !== null && (
         <g>
           <line x1={l.left} x2={l.width - l.right} y1={y(target)} y2={y(target)} stroke="var(--color-rust)" strokeWidth={1.5} />
-          <text x={l.width - l.right} y={y(target) - 5} textAnchor="end" fill="var(--color-ink-dim)" paintOrder="stroke" stroke="var(--color-bg)" strokeWidth={4}>
+          {/* The label lives above the plot where no column can reach it;
+              the y scale leaves 8% headroom above the tallest value. */}
+          <line x1={l.width - l.right - 14} x2={l.width - l.right} y1={l.top + 2} y2={l.top + 2} stroke="var(--color-rust)" strokeWidth={1.5} />
+          <text x={l.width - l.right - 18} y={l.top + 6} textAnchor="end" fill="var(--color-ink-dim)">
             target {fmt(target)}
           </text>
         </g>
