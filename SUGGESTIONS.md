@@ -37,6 +37,20 @@ acted on. Read this first.
   saying which fields. Inline entry editing in a dense table would mean
   the whole food sheet per row; the date link is one tap away instead.
   If that's not what you meant by inline, say so.
+- **`docs/10-today-design.md` drew the weight line with the raw reading
+  leading and the average as a caption — the reverse of rule R4.** The
+  rules auditor caught it; the code and the doc now lead with the average
+  (`178.7 3-day avg · reading 178.2`). If you'd rather see the raw number
+  first on the Today header, that's a product decision against R4, not a
+  tweak.
+- **Overlapping blocks: which one's targets win?** `targetsFor` resolves
+  each field through every covering block, latest-starting first, before
+  falling back to Settings — so an inner block that sets only calories
+  inherits protein from the outer block, not from Settings. R6b's wording
+  ("a Block covering the date that sets targets → Settings") doesn't say
+  what happens with two blocks. The test now pins the current behaviour
+  with values that can fail. Say if you'd rather the latest block alone
+  applies.
 - **Research Q1 vs Q2 disagree on iOS Shortcuts reliability.** Q1 recommends
   a weigh-in Shortcut; Q2 warns time-of-day automations fail silently. A
   note under Q1 reconciles them (run it on tap/unlock, not on a timer), but

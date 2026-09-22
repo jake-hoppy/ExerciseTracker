@@ -107,4 +107,64 @@ link went to `/d/2026-09-18`; the test edits were reverted.
 
 First 390px render had the session column squeezed to zero by fixed
 columns and a full-width Trained stamp per row — fixed with a tighter
-grid and a 44px tick-only toggle. `/verify-ui /block`: in progress.
+grid and a 44px tick-only toggle. `/verify-ui /block`: one round, passed;
+polish only (empty tick box has no interior mark; rest-day rule subtle;
+today had no marker — added the rust rule on today's row).
+
+### 4. Reviews and fixes
+
+**Whole-branch code review** (fresh reviewer, most capable model) of the
+Today work: 0 Critical, 3 Important, 12 Minor. Fixed in one pass, each
+reproduced first then re-checked (`49a1eb6`):
+- The double-submit guard existed but wasn't wired: a double-tap on New
+  item created two items. Now `pending` disables every sheet form's
+  submit while the action runs.
+- Weight bounds were only checked server-side, so `1782` produced an
+  un-clearable "tap to retry". Now out-of-range never submits (rust
+  outline), and a blur with no change no longer writes — that write was
+  creating empty Day rows on any date you glanced at, which `/block`
+  then listed forever.
+- `crypto.randomUUID` for optimistic ids needs a secure context; over
+  plain-http LAN (a phone hitting the dev server) it's undefined and
+  logging broke silently. Replaced with a plain id generator.
+- A page left open across midnight would log to yesterday. `TodayGuard`
+  on `/` refreshes when the tab returns on a later calendar date, once
+  per client date so a clock disagreement can't loop.
+Deferred minors are listed in the final hand-back and in SUGGESTIONS.md
+where they need a decision (archive has no undo; duplicate item names
+allowed; retry after a lost-response delete fails; sheet state survives
+close; ensureDay race under simultaneous first writes; textarea has no
+maxLength; EntryRow shares one invalid flag; a few cosmetic ones).
+
+**Rules audit** (`rules-auditor`, twice). Round one: R4, R6, R6b, R6c, R7,
+R1b/R1c all PASS on the math and the date flow, with one FAIL — the
+weight line led with the raw reading, not the average (R4). `docs/10`
+had drawn it that way. Fixed (`e24595b`) and the doc corrected. The audit
+also caught a test that couldn't fail (overlapping-block protein 150 ==
+settings 150) — re-pinned with 175. Round two: pending at time of writing;
+result appended below.
+
+### Phase 2 exit criteria (`docs/08-autonomous-run.md`)
+
+- [x] Today screen renders the current day — and any date, with or
+      without a Day row (the "outside every block" state no longer exists;
+      see SUGGESTIONS.md).
+- [x] Adding a saved item writes an Entry that survives reload — Playwright,
+      Task 6 check.
+- [x] Repeat meal in ≤ 3 taps from Today — **1 tap** (top six inline),
+      **2 taps** via the sheet. Counted above.
+- [x] Day totals sum from entries, never stored — `prisma/schema.prisma`
+      Day has no calories/protein columns; audit confirmed.
+- [x] Weight and trained persist — Playwright, Task 5 and block checks.
+- [x] `/verify-ui /` passes at 1280 and 390 — two rounds, stopped on a
+      polish finding. `/unlock` and `/block` one round each.
+- [x] No touch target under 44px — both reviewers checked every control.
+- [x] PIN gate: unauthenticated `/` → `/unlock`; right PIN sets the cookie;
+      five wrong lock out — Playwright.
+- [x] `APP_PIN` / `SESSION_SECRET` values in no tracked file — `git grep`
+      for both literal values: 0 hits. The names appear only as
+      `process.env.*` and in docs.
+- [x] `npm test` 82 passed; `npm run typecheck`, `npm run lint`,
+      `npm run build` clean.
+- [ ] Deployed to Vercel — skipped on instruction. Nothing pushed.
+- [ ] Three consecutive real days logged from the phone — needs you.
