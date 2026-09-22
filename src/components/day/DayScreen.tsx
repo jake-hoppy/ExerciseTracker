@@ -1,17 +1,12 @@
-import Link from "next/link";
-import { addDays } from "@/lib/dates";
-import { loadDayScreen, routeFor } from "@/lib/day-screen";
-import {
-  formatAvgLabel,
-  formatGrams,
-  formatKcal,
-  formatShortDate,
-  formatWeekday,
-  formatWeight,
-} from "@/lib/format";
+import { loadDayScreen } from "@/lib/day-screen";
+import { formatGrams, formatKcal } from "@/lib/format";
 import { dayTotals } from "@/lib/totals";
+import { DateNav } from "./DateNav";
 import { ROW_GRID } from "./grid";
+import { NotesField } from "./NotesField";
 import { Remaining } from "./Remaining";
+import { TrainedToggle } from "./TrainedToggle";
+import { WeightField } from "./WeightField";
 
 export async function DayScreen({ date }: { date: string }) {
   const data = await loadDayScreen(date);
@@ -22,27 +17,7 @@ export async function DayScreen({ date }: { date: string }) {
       <header
         className={`border-l-2 pl-3 ${data.isToday ? "border-l-rust" : "border-l-line"}`}
       >
-        <nav className="flex min-h-11 items-center justify-between" aria-label="Change day">
-          <Link
-            href={routeFor(addDays(date, -1))}
-            className="-ml-3 flex min-h-11 min-w-11 items-center justify-center font-mono text-lg text-ink-dim"
-            aria-label="Previous day"
-          >
-            ‹
-          </Link>
-          <p className="font-mono text-sm text-ink-dim">
-            {formatWeekday(date)} {formatShortDate(date)}
-            {data.isToday && " · today"}
-            {data.blockName && ` · ${data.blockName}`}
-          </p>
-          <Link
-            href={routeFor(addDays(date, 1))}
-            className="flex min-h-11 min-w-11 items-center justify-center font-mono text-lg text-ink-dim"
-            aria-label="Next day"
-          >
-            ›
-          </Link>
-        </nav>
+        <DateNav date={date} isToday={data.isToday} blockName={data.blockName} />
 
         <div className="flex items-center justify-between gap-4">
           <h1
@@ -52,24 +27,12 @@ export async function DayScreen({ date }: { date: string }) {
           >
             {data.sessionName ?? "—"}
           </h1>
-          {/* Task 5 replaces this with the Trained toggle */}
-          <span className="font-mono text-xs tracking-wider text-ink-dim uppercase">
-            {data.day?.trained ? "Trained ✓" : "Trained"}
-          </span>
+          <TrainedToggle date={date} trained={data.day?.trained ?? false} />
         </div>
 
         <Remaining totals={totals} targets={data.targets} />
 
-        <p className="mt-3 flex items-baseline gap-3 font-mono text-sm text-ink-dim tabular-nums">
-          <span className="label">Weight</span>
-          {/* Task 5 replaces this with the WeightField */}
-          <span className="text-lg text-ink">{formatWeight(data.day?.weight)}</span>
-          {data.weightAvg && (
-            <span>
-              {formatAvgLabel(data.weightAvg.count)} {formatWeight(data.weightAvg.average)}
-            </span>
-          )}
-        </p>
+        <WeightField date={date} weight={data.day?.weight ?? null} avg={data.weightAvg} />
       </header>
 
       {data.entries.length > 0 && (
@@ -113,11 +76,7 @@ export async function DayScreen({ date }: { date: string }) {
         </ul>
       </section>
 
-      <section className="mt-8" aria-label="Notes">
-        <p className="label mb-1">Notes</p>
-        {/* Task 5 replaces this with NotesField */}
-        <p className="min-h-11 font-serif text-ink-dim">{data.day?.notes ?? ""}</p>
-      </section>
+      <NotesField date={date} notes={data.day?.notes ?? null} />
     </main>
   );
 }

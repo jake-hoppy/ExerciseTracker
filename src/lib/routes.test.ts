@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { routeFor } from "./day-screen";
+import { routeFor } from "./routes";
 
 describe("routeFor", () => {
   it("sends today to / and any other date to /d/<date>", () => {

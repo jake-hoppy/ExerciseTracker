@@ -24,10 +24,6 @@ export type DayScreenData = {
   topItems: ItemView[];
 };
 
-export function routeFor(date: DateString, current: DateString = today()): string {
-  return date === current ? "/" : `/d/${date}`;
-}
-
 export async function loadDayScreen(date: DateString): Promise<DayScreenData> {
   const windowStart = addDays(date, -6);
   const [settings, types, blocks, day, weightDays, rawItems] = await Promise.all([
