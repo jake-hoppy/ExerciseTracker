@@ -42,13 +42,16 @@ export async function DayScreen({ date }: { date: string }) {
 
       <NotesField date={date} notes={data.day?.notes ?? null} />
 
-      <Link
-        href="/block"
-        className="mt-8 flex min-h-11 items-center justify-between border-y border-line-soft font-mono text-sm text-ink-dim"
-      >
-        <span>Every day</span>
-        <span className="pr-1 text-lg">›</span>
-      </Link>
+      <nav aria-label="More" className="mt-8 divide-y divide-line-soft border-y border-line-soft">
+        <Link href="/trends" className="flex min-h-11 items-center justify-between font-mono text-sm text-ink-dim">
+          <span>Trends</span>
+          <span className="pr-1 text-lg">›</span>
+        </Link>
+        <Link href="/block" className="flex min-h-11 items-center justify-between font-mono text-sm text-ink-dim">
+          <span>Every day</span>
+          <span className="pr-1 text-lg">›</span>
+        </Link>
+      </nav>
     </main>
   );
 }

@@ -39,6 +39,8 @@ npm run build            # prisma generate && next build
 npm run db:migrate       # prisma migrate dev — create + apply a migration
 npm run db:deploy        # prisma migrate deploy — apply only (CI / Vercel)
 npm run db:seed          # load data/seed-block.json; safe to re-run
+npm run seed:demo        # fill empty recent days with demo data (manifest in .demo/)
+npm run seed:clear       # remove exactly what seed:demo added
 npm run db:studio        # browse the database
 node scripts/shot.mjs / name   # screenshots to .shots/ at 1280 + 390 (dev server running)
 ```
@@ -59,13 +61,17 @@ docs/          Decisions, roadmap, domain rules, design system. Read before buil
 data/          Seed data — the completed 30-day block.
 prisma/        Schema, migrations, seed script.
 src/app/       Routes. `/` is Today; `/d/YYYY-MM-DD` any date; `/block` the
-               day list. `actions.ts` holds every server action.
+               day list; `/trends` the charts. `actions.ts` holds every
+               server action.
 src/components/day/  The Today screen: DayScreen (server) and the client
                pieces — DateNav, TrainedToggle, WeightField, NotesField,
                DayLog (entries + inline items), AddFoodSheet.
+src/components/trends/  WeightChart, DailyBars, StatTile, scale (chart
+               geometry; each chart draws a phone and a desktop layout).
 src/lib/       dates, routes (client-safe), schedule, days (ensureDay),
-               day-screen (read model), log (every write), validate (Zod),
-               items, weight, totals, format, db.
+               day-screen / block-screen / trends (read models), stats (the
+               rules module: streaks, averages, completion), log (every
+               write), validate (Zod), items, weight, totals, format, db.
 scripts/       shot.mjs for /verify-ui.
 .claude/       Subagent and command definitions.
 ```

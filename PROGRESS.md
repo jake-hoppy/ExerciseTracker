@@ -39,6 +39,107 @@ database tests for every write, `/verify-ui` on `/`, `/unlock` and `/block`
 not deployed.** Remaining is the human part: deploy, then three real days
 on the phone. Phase 3 not started — this run was scoped to Phase 2.
 
+## Phase 3 — plan
+
+Branch `phase-3` off `main` (`53e8b5b`). Deploy skipped on instruction.
+
+Scope from `docs/02-roadmap.md`: weight chart (raw dailies, 7-day rolling
+average, start and goal lines); calories and protein per day against
+target; streaks, completion counts, block summary; a stats module unit
+tested against every rule in `docs/04-domain-rules.md`. Done when "is this
+block working?" needs no arithmetic.
+
+1. **Stats module** `src/lib/stats.ts`, pure functions over one row per
+   calendar date `{ date, logged, calories, protein, weight, trained,
+   isRest }`, test-first with hand-checked values:
+   - `currentStreak(rows, today)` — R2: walk back from today; an unlogged
+     today is skipped, never counted against.
+   - `longestStreak(rows)` — R3: whole range, independent of today.
+   - `rollingAverageSeries(rows, window=7)` — R4 via the existing
+     `trailingAverage`, per date; a test proving a 7-calendar-day window
+     differs from a 7-entry window when days are missing.
+   - `mean(values)` — R6: nulls excluded, never counted as zero.
+   - `completion(rows)` — R5: training/rest/logged/trained counts derived
+     from the rows' sessions, never hardcoded.
+   - `weightDelta(series, start)` — R4: the headline delta comes from the
+     average, states its window when short; anchors at `startWeight` when
+     day 1 has no reading.
+2. **Demo data** `npm run seed:demo` / `npm run seed:clear`
+   (`prisma/demo.ts`). Demo fills only days that are empty (no entries,
+   no weight, no notes, not trained) in the 28 days before today, writes
+   a manifest to `.demo/manifest.json` (gitignored) listing exactly what
+   it touched, sets each demo day's notes to "Demo data — npm run
+   seed:clear", and links no FoodItem so usage counts stay real.
+   `seed:clear` reverses precisely the manifest. Real data is never
+   read, written or reordered by either.
+3. **Trends screen** `/trends`: range = the block covering today, else the
+   last 30 days through today. Tiles: current streak, longest streak,
+   logged N of M days, trained N of T training days, average weight delta.
+   Charts as inline SVG per `docs/03-design-system.md` (mono axis text
+   sized against the viewBox, gutters widened at 390): weight (thin raw
+   line + dots, thick average line, start/goal lines), calories per day
+   with the target line, protein per day with the target line. Load the
+   `dataviz` skill before drawing.
+4. **Verify**: `/verify-ui /trends` with demo data (cap 4);
+   `rules-auditor` on the stats module (cap 3); exit criteria from
+   `docs/08` Phase 3 recorded below; `seed:clear` run and the database
+   checked for zero demo rows before finishing.
+
+## Phase 3 — log
+
+### Stats module — built
+
+`src/lib/stats.ts`: `currentStreak` (R2), `longestStreak` (R3), `mean`
+(R6), `rollingAverageSeries` (R4 over `trailingAverage`), `completion`
+(R5), `weightDelta` (R4 headline). 23 tests with hand-checked values,
+including: today unlogged doesn't break the streak; a missing date is a
+miss; rest days count like any day (R1); the 7-calendar-day window
+differs from a 7-entry window when days are missing (the last seven
+readings spanning three weeks average 180.7, the calendar window's five
+average 179.38); a null weight/calorie day is excluded, not zero; the
+delta anchors at `startWeight` only when day 1 has no average.
+
+One decision the rules don't cover: with no block (so no `startWeight`)
+and a range that opens before the first weigh-in, the delta's origin is
+the first day that has an average. Without that the "Last 30 days" view
+could never show a delta.
+
+### Demo data — built
+
+`npm run seed:demo` fills empty days in the 28 before today (never today)
+with a downward weight trend plus daily noise, 3–5 meals copied by value
+(no `itemId`, so usage counts stay real), "trained" following the real
+schedule, and the note "Demo data — npm run seed:clear" on every demo
+day. It refuses to run if a manifest already exists. `npm run seed:clear`
+reverses exactly `.demo/manifest.json` (gitignored): rows it created are
+deleted, rows it filled are emptied. Ran demo → clear → demo during the
+build; the two real days in the window (09-20 trained, 09-21 everything)
+were skipped each time.
+
+Note: 09-19 had a real weigh-in earlier in the day, but by the time demo
+ran it was empty (someone cleared it while trying the app), so demo
+filled it and `seed:clear` will return it to empty, not to 178.8.
+
+### Trends screen — built
+
+`/trends`: range is the block covering today, else the last 30 days.
+Summary tiles lead with the weight change on the rolling average and its
+window ("−3.0 lb on the 6-day average"), then streaks, logged N of M,
+trained sessions against scheduled, average calories/protein against
+target. Three inline-SVG charts, each drawn twice (phone/desktop
+layouts) so axis text is legible at 390px per the design system's SVG
+rule: weight (thin ink line + dots, thick moss average, start/goal
+hairlines when a block sets them), calories and protein columns against
+the rust target line. Unlogged days are gaps. The chart colour trio
+(moss, ink, rust) was run through the dataviz validator for
+colour-vision separation; ink replaced ink-faint for the raw series
+because the grey failed the normal-vision floor against moss.
+
+Not built: hover tooltips/crosshair (the dataviz default). Marks carry
+native `<title>`s and `/block` is the table view. Noted in SUGGESTIONS.md.
+
+Linked from Today's footer and the block view header.
+
 ## Phase 2 — log
 
 ### 1. Today screen + food log — built

@@ -51,6 +51,28 @@ acted on. Read this first.
   what happens with two blocks. The test now pins the current behaviour
   with values that can fail. Say if you'd rather the latest block alone
   applies.
+## During the Phase 3 run
+
+- **Charts have no hover/tap tooltips.** The dataviz guidance defaults to
+  a crosshair on line charts and a per-mark tooltip on columns. Left out:
+  it needs a client component per chart, and on a phone a tap-crosshair
+  competes with scrolling. Marks carry native `<title>`s (visible on
+  hover on desktop) and `/block` is the table. Add it if you find yourself
+  wanting the exact number for a day on the chart.
+- **Weight delta with no block.** R4 anchors the series at day 1 with the
+  block's `startWeight`. With no block covering today (the current
+  state), there's no anchor, and the "Last 30 days" range opens before
+  the first weigh-in, so the delta's origin is the first day with an
+  average. If you'd rather it read from a fixed start weight, create a
+  block over the current period with `startWeight` set — the code
+  already prefers it.
+- **`seed:demo` filled 09-19.** It had a real 178.8 earlier in the day but
+  was empty (weight cleared, nothing logged) when demo ran, so it
+  qualified. `seed:clear` returns it to empty, not to 178.8. If that
+  weigh-in was real, re-enter it.
+- **The rate limiter locks you out of the dev server too.** Five wrong
+  PINs from any local test (including my Playwright checks) lock
+  `/api/unlock` for a minute for everything on localhost.
 - **Research Q1 vs Q2 disagree on iOS Shortcuts reliability.** Q1 recommends
   a weigh-in Shortcut; Q2 warns time-of-day automations fail silently. A
   note under Q1 reconciles them (run it on tap/unlock, not on a timer), but

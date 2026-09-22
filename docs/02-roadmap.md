@@ -63,6 +63,11 @@ opening a laptop. Use it for a week before Phase 3.
 
 **Done when:** you can answer "is this block working?" without doing arithmetic.
 
+> Shipped 2026-09-21: `/trends` with the stats module (`src/lib/stats.ts`)
+> tested against R2–R6c, weight chart with the 7-day average, calories and
+> protein against target, streak and completion tiles. Demo data for
+> looking at it before real use: `npm run seed:demo` / `seed:clear`.
+
 ## Phase 4 — Depth
 
 Pick from these based on what Phases 2–3 made you want. Don't build all of it.

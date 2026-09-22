@@ -19,9 +19,14 @@ export default async function BlockPage() {
     <main className="mx-auto max-w-2xl px-4 pt-4 pb-16">
       <nav className="flex min-h-11 items-center justify-between">
         <h1 className="font-display text-2xl font-semibold tracking-wide text-ink">Every day</h1>
-        <Link href="/" className="flex min-h-11 items-center font-mono text-sm text-ink-dim">
-          Today ›
-        </Link>
+        <span className="flex gap-4">
+          <Link href="/trends" className="flex min-h-11 items-center font-mono text-sm text-ink-dim">
+            Trends ›
+          </Link>
+          <Link href="/" className="flex min-h-11 items-center font-mono text-sm text-ink-dim">
+            Today ›
+          </Link>
+        </span>
       </nav>
 
       <div className="mb-1 grid grid-cols-[3.5rem_minmax(0,1fr)_3.25rem_3rem_2.25rem_2.75rem] gap-x-1.5 sm:grid-cols-[4.5rem_minmax(0,1fr)_4rem_3.5rem_3rem_2.75rem] sm:gap-x-3 items-center px-0 pt-4">
