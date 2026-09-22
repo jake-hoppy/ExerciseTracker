@@ -55,8 +55,19 @@ body {
   color: var(--color-ink-faint);
 }
 
+/* The PIN field's wrong-answer shake. */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.animate-shake {
+  animation: shake 150ms ease-in-out 2;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+    animation: none !important;
   }
 }
