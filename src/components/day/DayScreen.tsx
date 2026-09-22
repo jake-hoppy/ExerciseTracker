@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { loadDayScreen } from "@/lib/day-screen";
 import { DateNav } from "./DateNav";
 import { DayLog } from "./DayLog";
@@ -40,6 +41,14 @@ export async function DayScreen({ date }: { date: string }) {
       </DayLog>
 
       <NotesField date={date} notes={data.day?.notes ?? null} />
+
+      <Link
+        href="/block"
+        className="mt-8 flex min-h-11 items-center justify-between border-y border-line-soft font-mono text-sm text-ink-dim"
+      >
+        <span>Every day</span>
+        <span className="pr-1 text-lg">›</span>
+      </Link>
     </main>
   );
 }

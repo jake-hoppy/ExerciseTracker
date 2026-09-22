@@ -80,9 +80,11 @@ describe("targetsFor", () => {
   });
 
   it("prefers the latest-starting block when blocks overlap", () => {
-    const outer = { startDate: "2026-10-01", endDate: "2026-12-31", calTarget: 2000, proteinTarget: 150 };
+    // outer's protein (175) differs from settings' (150), so this proves the
+    // field falls through to the older covering block before Settings.
+    const outer = { startDate: "2026-10-01", endDate: "2026-12-31", calTarget: 2000, proteinTarget: 175 };
     const inner = { startDate: "2026-11-01", endDate: "2026-11-14", calTarget: 1800, proteinTarget: null };
-    expect(targetsFor("2026-11-05", [outer, inner], settings)).toEqual({ calTarget: 1800, proteinTarget: 150 });
-    expect(targetsFor("2026-10-15", [outer, inner], settings)).toEqual({ calTarget: 2000, proteinTarget: 150 });
+    expect(targetsFor("2026-11-05", [outer, inner], settings)).toEqual({ calTarget: 1800, proteinTarget: 175 });
+    expect(targetsFor("2026-10-15", [outer, inner], settings)).toEqual({ calTarget: 2000, proteinTarget: 175 });
   });
 });

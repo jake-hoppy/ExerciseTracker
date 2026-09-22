@@ -57,54 +57,73 @@ export function WeightField({
     });
   };
 
+  // The editable raw reading. In the header it follows the average (rule
+  // R4: the average leads); in the block view's rows it is the whole cell.
+  const reading = editing ? (
+    <input
+      autoFocus
+      type="text"
+      inputMode="decimal"
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={(e) => save(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+        if (e.key === "Escape") setEditing(false);
+      }}
+      aria-label="Weight in pounds"
+      className={`rounded-card border border-line bg-bg-alt px-2 py-1 text-ink ${
+        compact ? "w-full text-right text-sm" : "w-24 text-lg"
+      }`}
+    />
+  ) : (
+    <button
+      type="button"
+      onClick={open}
+      aria-label="Edit weight"
+      className={`min-h-11 text-ink ${compact ? "w-full text-right text-sm" : "text-left text-lg"} ${
+        invalid ? "rounded-card outline-2 outline-rust" : ""
+      }`}
+    >
+      {shown == null ? (
+        // Unset is the 6am state: a blank to fill in, the biggest target
+        // in the header (docs/10-today-design.md).
+        <span
+          aria-hidden
+          className={`inline-block border-b-2 border-dashed border-ink-faint align-baseline ${
+            compact ? "h-4 w-8" : "h-8 w-20"
+          }`}
+        />
+      ) : (
+        formatWeight(shown)
+      )}
+    </button>
+  );
+
+  if (compact) {
+    return (
+      <div>
+        <p className="flex min-h-11 items-center font-mono text-sm text-ink-dim tabular-nums">{reading}</p>
+        {failed !== null && <SaveError onRetry={() => save(failed)} />}
+      </div>
+    );
+  }
+
   return (
-    <div className={compact ? "" : "mt-3"}>
-      <p className="flex min-h-11 items-center gap-3 font-mono text-sm text-ink-dim tabular-nums">
-        {!compact && <span className="label">Weight</span>}
-        {editing ? (
-          <input
-            autoFocus
-            type="text"
-            inputMode="decimal"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onBlur={(e) => save(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-              if (e.key === "Escape") setEditing(false);
-            }}
-            aria-label="Weight in pounds"
-            className={`rounded-card border border-line bg-bg-alt px-2 py-1 text-ink ${
-              compact ? "w-full text-right text-sm" : "w-24 text-lg"
-            }`}
-          />
+    <div className="mt-3">
+      <p className="flex min-h-11 flex-wrap items-baseline gap-x-3 font-mono text-sm text-ink-dim tabular-nums">
+        <span className="label">Weight</span>
+        {avg ? (
+          <>
+            <span className="text-lg text-ink">{formatWeight(avg.average)}</span>
+            <span>{formatAvgLabel(avg.count)} avg</span>
+            <span className="flex items-baseline gap-2">
+              <span>reading</span>
+              {reading}
+            </span>
+          </>
         ) : (
-          <button
-            type="button"
-            onClick={open}
-            aria-label="Edit weight"
-            className={`min-h-11 text-ink ${compact ? "w-full text-right text-sm" : "text-left text-lg"} ${
-              invalid ? "rounded-card outline-2 outline-rust" : ""
-            }`}
-          >
-            {shown == null ? (
-              // Unset is the 6am state: a blank to fill in, the biggest
-              // target in the header (docs/10-today-design.md).
-              <span
-                aria-hidden
-                className={`inline-block border-b-2 border-dashed border-ink-faint align-baseline ${
-                  compact ? "h-4 w-8" : "h-8 w-20"
-                }`}
-              />
-            ) : (
-              formatWeight(shown)
-            )}
-          </button>
-        )}
-        {avg && (
-          <span>
-            {formatAvgLabel(avg.count)} {formatWeight(avg.average)}
-          </span>
+          reading
         )}
       </p>
       {failed !== null && <SaveError onRetry={() => save(failed)} />}
