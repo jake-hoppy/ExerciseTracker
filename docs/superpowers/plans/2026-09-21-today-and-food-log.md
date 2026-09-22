@@ -21,7 +21,7 @@
 - No save buttons, no confirmation toasts, no checkbox beside the number it describes.
 - Validation bounds: calories integer 0–5000; protein integer 0–500; weight 50–500 rounded to one decimal; name ≤ 80 characters.
 - Touch targets ≥ 44px. 390px is the primary width. `inputmode` numeric/decimal on number fields. Visible focus. 150ms colour transitions only; `prefers-reduced-motion` already handled in `globals.css`.
-- Design tokens in `src/app/globals.css` and `docs/03-design-system.md`: every number `font-mono`, labels use `.label`, `rounded-card`, left border encodes state.
+- Design tokens in `src/app/globals.css` and `docs/03-design-system.md`: every number `font-mono`, labels use `.label`. **`docs/10-today-design.md` is the visual direction for this screen and overrides class names shown in the tasks below**: ruled rows on a shared five-column grid, not cards; mixed-case date and session; totals as `991 of 2,100`; trigger copy `All items and quick add`. Apply it as you build each component, not only in Task 8.
 - Prisma client imports from `@/generated/prisma/client`; app code uses `db` from `@/lib/db`. Prisma is pinned to 7.10.0.
 - Commit after every task. Commit messages end with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
 - Never call the migration or seed against anything but the dev database in `.env.local`. This plan adds no migration.
