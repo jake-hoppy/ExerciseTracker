@@ -16,7 +16,9 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed:demo": "tsx prisma/demo.ts demo",
+    "seed:clear": "tsx prisma/demo.ts clear"
   },
   "dependencies": {
     "@neon/config": "^1.7.2",

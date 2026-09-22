@@ -42,3 +42,4 @@ coverage/
 
 # Prisma generated client
 src/generated/
+.demo/
