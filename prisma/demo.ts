@@ -14,6 +14,7 @@ import { config } from "dotenv";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { addDays, eachDate, today } from "../src/lib/dates";
+import { workoutTypeIdFor } from "../src/lib/schedule";
 
 config({ path: ".env.local" });
 
@@ -66,13 +67,23 @@ async function demo(db: PrismaClient) {
   const byDate = new Map(existing.map((d) => [d.date, d]));
   const manifest: Manifest = { createdAt: new Date().toISOString(), days: [] };
   const rand = rng(20260921);
-  let weight = 181.4;
+  // Rest days come from the real schedule so "trained" lines up with it.
+  const [settings, types] = await Promise.all([
+    db.settings.findUnique({ where: { id: "singleton" } }),
+    db.workoutType.findMany(),
+  ]);
+  const isRest = (date: string) => {
+    const id = settings && workoutTypeIdFor(date, settings, null);
+    return types.find((t) => t.id === id)?.isRest ?? false;
+  };
 
   for (const [i, date] of dates.entries()) {
     const found = byDate.get(date);
     if (found && !isEmpty(found)) continue; // real data: leave it alone
-    // Gentle downward trend with daily noise; one day in nine unlogged.
-    weight = Math.round((weight - 0.09 + (rand() - 0.5) * 1.6) * 10) / 10;
+    // A cut: about a pound a week off a trend line, with independent daily
+    // water-weight noise (not a random walk); one day in nine unlogged.
+    const weight = Math.round((181.4 - i * 0.14 + (rand() - 0.5) * 1.8) * 10) / 10;
+    const trained = !isRest(date) && rand() < 0.85;
     const skipFood = rand() < 0.11;
     const skipWeight = rand() < 0.08;
     const mealCount = 3 + Math.floor(rand() * 3);
@@ -81,10 +92,10 @@ async function demo(db: PrismaClient) {
     const day = found
       ? await db.day.update({
           where: { id: found.id },
-          data: { weight: skipWeight ? null : weight, trained: i % 4 !== 3 && rand() < 0.85, notes: DEMO_NOTE },
+          data: { weight: skipWeight ? null : weight, trained, notes: DEMO_NOTE },
         })
       : await db.day.create({
-          data: { date, weight: skipWeight ? null : weight, trained: i % 4 !== 3 && rand() < 0.85, notes: DEMO_NOTE },
+          data: { date, weight: skipWeight ? null : weight, trained, notes: DEMO_NOTE },
         });
     if (!skipFood) {
       await db.entry.createMany({

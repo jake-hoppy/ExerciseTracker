@@ -106,9 +106,13 @@ export function weightDelta(
   const last = series[series.length - 1];
   if (last.average === null) return null;
   const first = series[0];
-  const origin = first.average ?? startWeight;
+  // Origin: the first day's average; else the block's start weight as an
+  // anchor; else (no block) the first day that has an average.
+  const firstWithAvg = series.findIndex((p) => p.average !== null);
+  const origin = first.average ?? startWeight ?? series[firstWithAvg].average;
   if (origin === null) return null;
-  // One point whose own average is the origin has no change to report.
-  if (series.length === 1 && first.average !== null) return null;
+  // The origin must be a different point than the last, or there is no change to report.
+  const originIsLast = first.average === null && startWeight === null && firstWithAvg === series.length - 1;
+  if (originIsLast || (series.length === 1 && first.average !== null)) return null;
   return { delta: Math.round((last.average - origin) * 10) / 10, window: last.count };
 }

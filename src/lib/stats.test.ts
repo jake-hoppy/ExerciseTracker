@@ -176,6 +176,15 @@ describe("weightDelta (R4)", () => {
     expect(weightDelta(series, 180.2)).toEqual({ delta: -2.4, window: 7 });
   });
 
+  it("starts from the first available average when the range opens with none and there is no anchor", () => {
+    const series = [
+      { date: "2026-08-23", average: null, count: 0 },
+      { date: "2026-08-24", average: 181.4, count: 1 },
+      { date: "2026-09-21", average: 179.0, count: 7 },
+    ];
+    expect(weightDelta(series, null)).toEqual({ delta: -2.4, window: 7 });
+  });
+
   it("states a short window", () => {
     const series = [
       { date: "2026-09-18", average: 179.0, count: 1 },
