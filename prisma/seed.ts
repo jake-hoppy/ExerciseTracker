@@ -38,10 +38,19 @@ type SeedBlock = {
   days: SeedDay[];
 };
 
-// The standing 4-day rotation, anchored on the day Settings is created (D4).
-// Historical days keep their logged session as a per-day override, because
-// the Aug–Sep block swapped in Pull + Legs and doesn't follow the cycle.
-const CYCLE = ["Push + Run", "Pull + Run", "Legs", "Rest"];
+// The standing weekly schedule, index 0 = Sunday (rule R1b). Every date —
+// past or future — resolves through this, so no Day carries a per-day
+// override; the seed's `workout` field is kept as a record of what the
+// Aug–Sep block originally ran, not as something applied.
+const WEEK = [
+  "Rest", // Sun
+  "Push + Run", // Mon
+  "Legs", // Tue
+  "Pull + Run", // Wed
+  "Rest", // Thu
+  "Push + Run", // Fri
+  "Pull + Run", // Sat
+];
 
 // docs/07-food-log.md, "Seed list".
 const FOOD_ITEMS: Array<[name: string, calories: number, protein: number]> = [
@@ -88,7 +97,7 @@ async function main() {
 
   try {
     const typeNames = new Map<string, boolean>();
-    for (const name of CYCLE) typeNames.set(name, name === "Rest");
+    for (const name of WEEK) typeNames.set(name, name === "Rest");
     for (const d of seed.days) typeNames.set(d.workout, d.rest);
 
     const typeIds = new Map<string, string>();
@@ -105,8 +114,10 @@ async function main() {
       where: { id: "singleton" },
       update: {},
       create: {
-        scheduleMode: "cycle",
-        pattern: CYCLE.map((name) => typeIds.get(name)!),
+        scheduleMode: "weekly",
+        pattern: WEEK.map((name) => typeIds.get(name)!),
+        // Unused by weekly mode, which indexes by weekday, but the column is
+        // required and a cycle would anchor here.
         anchorDate: today(),
         calTarget: seed.targets.calTarget,
         proteinTarget: seed.targets.proteinTarget,
@@ -131,7 +142,8 @@ async function main() {
 
     for (const d of seed.days) {
       const data = {
-        workoutTypeId: typeIds.get(d.workout)!,
+        // No override: the weekly schedule answers for these dates too.
+        workoutTypeId: null,
         trained: d.workoutDone,
         weight: d.weight,
         notes: d.notes.trim() === "" ? null : d.notes,
@@ -158,7 +170,7 @@ async function main() {
     }
 
     console.log(
-      `Seeded settings (cycle from ${settings.anchorDate}), ${typeIds.size} workout types, ` +
+      `Seeded settings (${settings.scheduleMode}), ${typeIds.size} workout types, ` +
         `${seed.days.length} days of "${seed.plan}", ${await db.foodItem.count()} food items.`,
     );
   } finally {
