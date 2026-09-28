@@ -62,9 +62,9 @@ export function ItemForm({
       placeholder={label}
       aria-label={label}
       aria-invalid={bad || undefined}
-      className={`min-h-11 min-w-0 flex-1 rounded-card border bg-bg-alt px-3 text-ink placeholder:text-ink-faint ${
-        mode === "numeric" ? "font-mono" : "font-serif"
-      } ${bad ? "border-rust" : "border-line"}`}
+      className={`min-h-11 min-w-0 flex-1 rounded-card border bg-board-2 px-3 text-chalk placeholder:text-chalk-3 ${
+        mode === "numeric" ? "font-mono" : "font-display"
+      } ${bad ? "border-gold" : "border-rule"}`}
     />
   );
 
@@ -82,7 +82,7 @@ export function ItemForm({
         <button
           type="submit"
           disabled={pending}
-          className="min-h-11 rounded-card border border-moss px-4 font-mono text-xs tracking-wider text-moss uppercase disabled:opacity-50"
+          className="min-h-11 rounded-card border border-chalk px-4 font-mono text-xs tracking-wider text-chalk uppercase disabled:opacity-50"
         >
           {submitLabel}
         </button>
@@ -90,12 +90,12 @@ export function ItemForm({
       <div className="flex items-center gap-2">
         {field(name, setName, requireName ? "Name" : "Name (optional)", errors.name, "text")}
         {showSave && !requireName && (
-          <label className="flex min-h-11 shrink-0 items-center gap-2 font-mono text-xs tracking-wider text-ink-dim uppercase">
+          <label className="flex min-h-11 shrink-0 items-center gap-2 font-mono text-xs tracking-wider text-chalk-2 uppercase">
             <input
               type="checkbox"
               checked={save}
               onChange={(e) => setSave(e.target.checked)}
-              className="size-5 accent-moss"
+              className="size-5 accent-gold"
             />
             Save to list
           </label>
@@ -104,7 +104,7 @@ export function ItemForm({
           <button
             type="button"
             onClick={onCancel}
-            className="min-h-11 shrink-0 rounded-card px-3 font-mono text-xs tracking-wider text-ink-dim uppercase"
+            className="min-h-11 shrink-0 rounded-card px-3 font-mono text-xs tracking-wider text-chalk-2 uppercase"
           >
             Cancel
           </button>

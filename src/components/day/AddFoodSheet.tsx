@@ -83,7 +83,7 @@ export function AddFoodSheet({
         if (e.target === dialog.current) onClose(); // scrim tap
       }}
       aria-label="Add food"
-      className="mx-auto mt-auto mb-0 max-h-[85dvh] w-full max-w-2xl overflow-y-auto border-t border-line bg-surface p-0 text-ink backdrop:bg-black/60 sm:mb-6 sm:rounded-card sm:border"
+      className="mx-auto mt-auto mb-0 max-h-[85dvh] w-full max-w-2xl overflow-y-auto border-t-2 border-rule bg-board-2 p-0 text-chalk backdrop:bg-black/70 sm:mb-6 sm:rounded-card sm:border-2"
     >
       <div className="px-4 pt-4 pb-6">
         <section aria-label="Quick add">
@@ -115,14 +115,14 @@ export function AddFoodSheet({
                 onChange={(e) => setFilter(e.target.value)}
                 placeholder="Filter"
                 aria-label="Filter items"
-                className="min-h-11 w-32 rounded-card border border-line bg-bg-alt px-3 font-mono text-sm text-ink"
+                className="min-h-11 w-32 rounded-card border border-rule bg-board-2 px-3 font-mono text-sm text-chalk"
               />
             )}
           </div>
-          <ul className="divide-y divide-line-soft border-y border-line-soft">
+          <ul className="divide-y divide-rule-soft border-y border-rule-soft">
             {shown.map((item) =>
               editing !== "new" && editing?.id === item.id ? (
-                <li key={item.id} className="border-l-2 border-l-rust py-3 pl-3">
+                <li key={item.id} className="border-l-2 border-l-gold py-3 pl-3">
                   <ItemForm
                     initial={item}
                     requireName
@@ -135,7 +135,7 @@ export function AddFoodSheet({
                   <button
                     type="button"
                     onClick={() => archive(item.id)}
-                    className="mt-1 min-h-11 font-mono text-xs tracking-wider text-danger uppercase"
+                    className="mt-1 min-h-11 font-mono text-xs tracking-wider text-over uppercase"
                   >
                     Archive item
                   </button>
@@ -150,7 +150,7 @@ export function AddFoodSheet({
                       type="button"
                       onClick={() => setEditing(item)}
                       aria-label={`Edit item ${item.name}`}
-                      className="flex min-h-11 min-w-11 items-center justify-center font-mono text-ink-faint"
+                      className="flex min-h-11 min-w-11 items-center justify-center font-mono text-chalk-3"
                     >
                       ⋯
                     </button>
@@ -176,7 +176,7 @@ export function AddFoodSheet({
             <button
               type="button"
               onClick={() => setEditing("new")}
-              className="flex min-h-11 w-full items-center border-b border-line-soft text-left font-mono text-sm text-ink-dim"
+              className="flex min-h-11 w-full items-center border-b border-rule-soft text-left font-mono text-sm text-chalk-2"
             >
               + New item
             </button>
@@ -186,7 +186,7 @@ export function AddFoodSheet({
         <button
           type="button"
           onClick={onClose}
-          className="mt-6 flex min-h-11 w-full items-center justify-center rounded-card border border-line font-mono text-xs tracking-wider text-ink-dim uppercase"
+          className="mt-6 flex min-h-11 w-full items-center justify-center rounded-card border border-rule font-mono text-xs tracking-wider text-chalk-2 uppercase"
         >
           Close
         </button>

@@ -6,8 +6,8 @@ import { formatAvgLabel, formatWeight } from "@/lib/format";
 import { SaveError } from "./SaveError";
 
 // The 6am target. Tapping the number swaps in a decimal input pre-filled
-// with the current value; blur or Enter saves; empty saves null. The
-// trailing average sits beside it because the average leads (rule R4).
+// with the current value; blur or Enter saves; empty saves null. The average
+// leads and the raw reading sits beside it, smaller (rule R4).
 export function WeightField({
   date,
   weight,
@@ -57,75 +57,84 @@ export function WeightField({
     });
   };
 
-  // The editable raw reading. In the header it follows the average (rule
-  // R4: the average leads); in the block view's rows it is the whole cell.
-  const reading = editing ? (
-    <input
-      autoFocus
-      type="text"
-      inputMode="decimal"
-      value={draft}
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={(e) => save(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-        if (e.key === "Escape") setEditing(false);
-      }}
-      aria-label="Weight in pounds"
-      className={`rounded-card border border-line bg-bg-alt px-2 py-1 text-ink ${
-        compact ? "w-full text-right text-sm" : "w-24 text-lg"
-      }`}
-    />
-  ) : (
-    <button
-      type="button"
-      onClick={open}
-      aria-label="Edit weight"
-      className={`min-h-11 text-ink ${compact ? "w-full text-right text-sm" : "text-left text-lg"} ${
-        invalid ? "rounded-card outline-2 outline-rust" : ""
-      }`}
-    >
-      {shown == null ? (
-        // Unset is the 6am state: a blank to fill in, the biggest target
-        // in the header (docs/10-today-design.md).
-        <span
-          aria-hidden
-          className={`inline-block border-b-2 border-dashed border-ink-faint align-baseline ${
-            compact ? "h-4 w-8" : "h-8 w-20"
-          }`}
-        />
-      ) : (
-        formatWeight(shown)
-      )}
-    </button>
-  );
+  // `big` is the unaveraged case: no average yet, so the reading is the
+  // headline and the blank is the biggest target on the screen at 6am.
+  const reading = (big: boolean) =>
+    editing ? (
+      <input
+        autoFocus
+        type="text"
+        inputMode="decimal"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={(e) => save(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+          if (e.key === "Escape") setEditing(false);
+        }}
+        aria-label="Weight in pounds"
+        className={`rounded-card border border-rule bg-slate-2 px-2 py-1 font-mono text-chalk tabular-nums ${
+          compact ? "w-full text-right text-sm" : big ? "w-32 text-3xl" : "w-24 text-lg"
+        }`}
+      />
+    ) : (
+      <button
+        type="button"
+        onClick={open}
+        aria-label="Edit weight"
+        className={`flex min-h-11 font-mono leading-none text-chalk tabular-nums transition-colors duration-150 ${
+          compact
+            ? "w-full items-center justify-end text-sm"
+            : big
+              ? "items-end text-3xl"
+              : "items-end justify-end text-lg"
+        } ${invalid ? "rounded-card outline-2 outline-gold" : ""}`}
+      >
+        {shown == null ? (
+          <span
+            aria-hidden
+            className={`inline-block border-b-2 border-dashed align-baseline ${
+              compact ? "h-4 w-6 border-rule" : big ? "h-8 w-24 border-chalk-3" : "h-6 w-16 border-chalk-3"
+            }`}
+          />
+        ) : (
+          formatWeight(shown)
+        )}
+      </button>
+    );
 
   if (compact) {
     return (
       <div>
-        <p className="flex min-h-11 items-center font-mono text-sm text-ink-dim tabular-nums">{reading}</p>
+        <p className="flex min-h-11 items-center font-mono text-sm text-chalk-2 tabular-nums">
+          {reading(false)}
+        </p>
         {failed !== null && <SaveError onRetry={() => save(failed)} />}
       </div>
     );
   }
 
   return (
-    <div className="mt-3">
-      <p className="flex min-h-11 flex-wrap items-baseline gap-x-3 font-mono text-sm text-ink-dim tabular-nums">
-        <span className="label">Weight</span>
-        {avg ? (
-          <>
-            <span className="text-lg text-ink">{formatWeight(avg.average)}</span>
-            <span>{formatAvgLabel(avg.count)} avg</span>
-            <span className="flex items-baseline gap-2">
-              <span>reading</span>
-              {reading}
+    <div className="mt-8 border-t border-rule-soft pt-4">
+      {avg ? (
+        <div className="flex items-end justify-between gap-6">
+          <p>
+            <span className="flex min-h-11 items-end font-mono text-3xl leading-none text-chalk tabular-nums">
+              {formatWeight(avg.average)}
             </span>
-          </>
-        ) : (
-          reading
-        )}
-      </p>
+            <span className="label mt-1.5 block">{formatAvgLabel(avg.count)} average, lb</span>
+          </p>
+          <p className="text-right">
+            {reading(false)}
+            <span className="label mt-1.5 block">today&apos;s reading</span>
+          </p>
+        </div>
+      ) : (
+        <p>
+          {reading(true)}
+          <span className="label mt-1.5 block">weight this morning, lb</span>
+        </p>
+      )}
       {failed !== null && <SaveError onRetry={() => save(failed)} />}
     </div>
   );

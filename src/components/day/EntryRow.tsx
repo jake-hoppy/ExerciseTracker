@@ -43,8 +43,8 @@ export function EntryRow({
       value={value}
       onChange={(e) => set(e.target.value)}
       aria-label={name}
-      className={`w-full min-w-0 rounded-card border bg-bg-alt px-1 py-1 text-right font-mono text-sm text-ink ${
-        invalid ? "border-rust" : "border-line"
+      className={`w-full min-w-0 rounded-card border bg-board-2 px-1 py-1 text-right font-mono text-sm text-chalk ${
+        invalid ? "border-gold" : "border-rule"
       }`}
     />
   );
@@ -52,14 +52,14 @@ export function EntryRow({
   if (editing) {
     return (
       <li className={`${ROW_GRID} min-h-11 py-1`}>
-        <span className="font-mono text-moss">✓</span>
-        <span className="line-clamp-2 font-serif leading-tight text-ink">{label}</span>
+        <span className="font-mono text-chalk">✓</span>
+        <span className="line-clamp-2 leading-snug text-chalk">{label}</span>
         {numberField(cal, setCal, "Calories")}
         {numberField(prot, setProt, "Protein grams")}
         <button
           type="button"
           onClick={done}
-          className="flex min-h-11 items-center justify-center font-mono text-xs tracking-wider text-moss uppercase"
+          className="flex min-h-11 items-center justify-center font-mono text-xs tracking-wider text-chalk uppercase"
         >
           Done
         </button>
@@ -68,7 +68,7 @@ export function EntryRow({
   }
 
   return (
-    <li className={`${ROW_GRID} min-h-11 ${entry.pending ? "opacity-60" : ""}`}>
+    <li className={`${ROW_GRID} min-h-11 py-1.5 ${entry.pending ? "opacity-60" : ""}`}>
       <button
         type="button"
         onClick={() => setEditing(true)}
@@ -76,12 +76,12 @@ export function EntryRow({
         aria-label={`Edit ${label}`}
         className="col-span-4 grid min-h-11 grid-cols-subgrid items-center text-left"
       >
-        <span className="font-mono text-moss">✓</span>
-        <span className="line-clamp-2 py-1.5 font-serif leading-tight text-ink">{label}</span>
-        <span className="text-right font-mono text-sm text-ink-dim tabular-nums">
+        <span className="font-mono text-chalk">✓</span>
+        <span className="line-clamp-2 leading-snug text-chalk">{label}</span>
+        <span className="text-right font-mono text-sm text-chalk-2 tabular-nums">
           {formatKcal(entry.calories)}
         </span>
-        <span className="text-right font-mono text-sm text-ink-dim tabular-nums">
+        <span className="text-right font-mono text-sm text-chalk-2 tabular-nums">
           {formatGrams(entry.protein)}
         </span>
       </button>
@@ -90,7 +90,7 @@ export function EntryRow({
         onClick={() => onRemove(entry.id)}
         disabled={entry.pending}
         aria-label={`Remove ${label}`}
-        className="flex min-h-11 min-w-11 items-center justify-center font-mono text-ink-faint"
+        className="flex min-h-11 min-w-11 items-center justify-center font-mono text-chalk-3"
       >
         ✕
       </button>

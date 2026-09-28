@@ -58,11 +58,11 @@ export function PinForm({ from }: { from: string }) {
           setError(null);
           if (v.length === 4) void submit(v);
         }}
-        className={`h-16 w-40 rounded-card border border-line bg-bg-alt text-center font-mono text-3xl tracking-[0.5em] text-ink ${
-          shake ? "animate-shake border-danger" : ""
+        className={`h-16 w-44 rounded-card border border-rule bg-board-2 pl-[0.5em] text-center font-mono text-3xl tracking-[0.5em] text-chalk ${
+          shake ? "animate-shake border-over" : ""
         }`}
       />
-      <p id="pin-error" role="alert" className="min-h-6 font-mono text-sm text-danger">
+      <p id="pin-error" role="alert" className="min-h-6 font-mono text-sm text-over">
         {error}
       </p>
     </form>

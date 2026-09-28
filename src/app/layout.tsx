@@ -1,21 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Oswald, Source_Serif_4 } from "next/font/google";
+import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const display = Oswald({
-  variable: "--font-oswald",
+// Two families, clearly distinct: a wide grotesque for words, a mono for
+// every number (docs/03-design-system.md).
+const display = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
-  weight: ["500", "600"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const serif = Source_Serif_4({
-  variable: "--font-source-serif",
+const mono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
   subsets: ["latin"],
-});
-
-const mono = JetBrains_Mono({
-  variable: "--font-jetbrains",
-  subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -24,14 +22,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#262C29",
+  themeColor: "#181E2A",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${display.variable} ${serif.variable} ${mono.variable} antialiased`}
+      className={`${display.variable} ${mono.variable} antialiased`}
     >
       <body className="min-h-dvh">{children}</body>
     </html>

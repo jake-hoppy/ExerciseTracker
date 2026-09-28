@@ -53,7 +53,6 @@ export function DayLog({
   entries,
   topItems,
   items,
-  isToday,
   targets,
   children,
 }: {
@@ -61,7 +60,6 @@ export function DayLog({
   entries: EntryView[];
   topItems: ItemView[];
   items: ItemView[];
-  isToday: boolean;
   targets: { calTarget: number | null; proteinTarget: number | null };
   children?: React.ReactNode;
 }) {
@@ -121,17 +119,15 @@ export function DayLog({
 
   return (
     <>
-      {/* Continues the header's margin rule (rust = today) through the
-          remaining line and the weight line, per docs/10-today-design.md. */}
-      <div className={`border-l-2 pt-5 pl-3 ${isToday ? "border-l-rust" : "border-l-line"}`}>
+      <div className="pt-6">
         <Remaining totals={dayTotals(optimistic)} targets={targets} />
         {children}
       </div>
 
       {optimistic.length > 0 && (
-        <section className="mt-8" aria-label="Logged">
-          <p className="label mb-1">Logged</p>
-          <ul className="divide-y divide-line-soft border-y border-line-soft">
+        <section className="mt-9" aria-label="Eaten">
+          <p className="label mb-2">Eaten</p>
+          <ul className="divide-y divide-rule-soft border-y border-rule-soft">
             {optimistic.map((e) => (
               <EntryRow key={e.id} entry={e} onEdit={edit} onRemove={remove} />
             ))}
@@ -140,9 +136,9 @@ export function DayLog({
       )}
       {retry && <SaveError onRetry={retry} />}
 
-      <section className="mt-8" aria-label="Log">
-        <p className="label mb-1">Log</p>
-        <ul className="divide-y divide-line-soft border-y border-line-soft">
+      <section className="mt-9" aria-label="Add again">
+        <p className="label mb-2">Add again</p>
+        <ul className="divide-y divide-rule-soft border-y border-rule-soft">
           {topItems.map((i) => (
             <ItemRow key={i.id} item={i} onLog={log} />
           ))}
@@ -150,10 +146,9 @@ export function DayLog({
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="flex min-h-11 w-full items-center justify-between border-b border-line-soft pl-7 font-mono text-sm text-ink-dim"
+          className="flex min-h-11 w-full items-center border-b border-rule-soft pl-7 font-mono text-sm text-chalk-2 transition-colors duration-150 hover:text-chalk"
         >
-          <span>All items and quick add</span>
-          <span className="pr-4 text-lg">›</span>
+          All items and quick add
         </button>
         <AddFoodSheet
           date={date}

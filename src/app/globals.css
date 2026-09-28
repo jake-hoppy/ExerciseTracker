@@ -1,30 +1,26 @@
 @import "tailwindcss";
 
-/* Tokens from docs/03-design-system.md. */
+/* Tokens from docs/03-design-system.md — chalk on board.
+   One hue (gold). "Logged" is encoded as brightness, not colour. */
 @theme {
-  --color-bg: #262c29;
-  --color-bg-alt: #2d3430;
-  --color-surface: #343b37;
-  --color-surface-2: #3d453f;
-  --color-line: #4e564f;
-  --color-line-soft: #404842;
+  --color-board: #181e2a;
+  --color-board-2: #1f2735;
+  --color-board-3: #27303f;
+  --color-rule: #333e4f;
+  --color-rule-soft: #262f3d;
 
-  --color-ink: #f2efe6;
-  --color-ink-dim: #b7beb8;
-  --color-ink-faint: #818b83;
+  --color-chalk: #ece9e1;
+  --color-chalk-2: #9aa5b4;
+  --color-chalk-3: #7c8593;
 
-  --color-moss: #8cad7b;
-  --color-moss-dim: #6c8961;
-  --color-rust: #d08a48;
-  --color-rust-dim: #a16c34;
-  --color-parchment: #f5f0df;
-  --color-danger: #c96b4c;
+  --color-gold: #e9a53a;
+  --color-gold-dim: #a6762a;
+  --color-over: #ee6a5c;
 
-  --font-display: var(--font-oswald), "Oswald", sans-serif;
-  --font-serif: var(--font-source-serif), "Source Serif 4", Georgia, serif;
-  --font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+  --font-display: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
 
-  --radius-card: 3px;
+  --radius-card: 2px;
 }
 
 html {
@@ -32,27 +28,61 @@ html {
 }
 
 body {
-  color: var(--color-ink);
-  font-family: var(--font-serif);
+  color: var(--color-chalk);
+  font-family: var(--font-display);
+  /* One cold wash off the top edge. No decorative gradients. */
   background:
-    radial-gradient(ellipse 80% 50% at 0% 0%, rgb(140 173 123 / 0.1), transparent 70%),
-    radial-gradient(ellipse 70% 45% at 100% 0%, rgb(208 138 72 / 0.08), transparent 70%),
-    var(--color-bg);
+    radial-gradient(ellipse 120% 40% at 50% 0%, rgb(80 104 140 / 0.14), transparent 70%),
+    var(--color-board);
   background-attachment: fixed;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-rust);
+  outline: 2px solid var(--color-gold);
   outline-offset: 2px;
 }
 
-/* Labels: uppercase, small, tracked, faint. */
+/* Section labels: mono, small, sentence case. Not a tracked-out eyebrow. */
 .label {
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--color-chalk-3);
+}
+
+/* Column heads in the day table — small caps is a ledger convention, and
+   these label actual columns rather than decorating a section. */
+.colhead {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--color-ink-faint);
+  color: var(--color-chalk-3);
+}
+
+/* The tick tally: discrete marks that fill as the day is logged, with a gold
+   notch at the target and visible room past it. Every layer spans the full
+   width and is clipped, never resized, so the ticks stay in register. */
+.tally {
+  position: relative;
+  height: 14px;
+}
+.tally-layer {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to right,
+    currentColor 0 2px,
+    transparent 2px 7px
+  );
+}
+/* The target notch, taller than the ticks so it reads as the mark to hit. */
+.tally-notch {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background: var(--color-gold);
 }
 
 /* The PIN field's wrong-answer shake. */

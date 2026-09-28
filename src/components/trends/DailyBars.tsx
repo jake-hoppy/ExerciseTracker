@@ -19,7 +19,7 @@ export function DailyBars({
   const values = rows.map((r) => r[field]);
   const real = values.filter((v): v is number => v !== null);
   if (real.length === 0) {
-    return <p className="font-mono text-sm text-ink-faint">Nothing logged in this range.</p>;
+    return <p className="font-mono text-sm text-chalk-3">Nothing logged in this range.</p>;
   }
   const max = Math.max(...real, target ?? 0) * 1.08;
   const fmt = unit === "kcal" ? formatKcal : formatGrams;
@@ -65,8 +65,8 @@ function Drawing({
         .filter((t) => t > 0)
         .map((t) => (
           <g key={t}>
-            <line x1={l.left} x2={l.width - l.right} y1={y(t)} y2={y(t)} stroke="var(--color-line-soft)" strokeWidth={1} />
-            <text x={l.left - 6} y={y(t) + 4} textAnchor="end" fill="var(--color-ink-faint)">
+            <line x1={l.left} x2={l.width - l.right} y1={y(t)} y2={y(t)} stroke="var(--color-rule-soft)" strokeWidth={1} />
+            <text x={l.left - 6} y={y(t) + 4} textAnchor="end" fill="var(--color-chalk-2)">
               {fmt(t)}
             </text>
           </g>
@@ -80,7 +80,7 @@ function Drawing({
           <path
             key={i}
             d={`M${(cx - bar / 2).toFixed(1)},${y0} v${(-h + r).toFixed(1)} a${r},${r} 0 0 1 ${r},-${r} h${(bar - 2 * r).toFixed(1)} a${r},${r} 0 0 1 ${r},${r} v${(h - r).toFixed(1)} z`}
-            fill="var(--color-moss-dim)"
+            fill="var(--color-chalk-2)"
           >
             <title>{`${formatShortDate(rows[i].date)}: ${fmt(v)}`}</title>
           </path>
@@ -88,18 +88,18 @@ function Drawing({
       })}
       {target !== null && (
         <g>
-          <line x1={l.left} x2={l.width - l.right} y1={y(target)} y2={y(target)} stroke="var(--color-rust)" strokeWidth={1.5} />
+          <line x1={l.left} x2={l.width - l.right} y1={y(target)} y2={y(target)} stroke="var(--color-gold)" strokeWidth={1.5} />
           {/* The label lives above the plot where no column can reach it;
               the y scale leaves 8% headroom above the tallest value. */}
-          <line x1={l.width - l.right - 14} x2={l.width - l.right} y1={l.top + 2} y2={l.top + 2} stroke="var(--color-rust)" strokeWidth={1.5} />
-          <text x={l.width - l.right - 18} y={l.top + 6} textAnchor="end" fill="var(--color-ink-dim)">
+          <line x1={l.width - l.right - 14} x2={l.width - l.right} y1={l.top + 2} y2={l.top + 2} stroke="var(--color-gold)" strokeWidth={1.5} />
+          <text x={l.width - l.right - 18} y={l.top + 6} textAnchor="end" fill="var(--color-chalk-2)">
             target {fmt(target)}
           </text>
         </g>
       )}
-      <line x1={l.left} x2={l.width - l.right} y1={y0} y2={y0} stroke="var(--color-line)" strokeWidth={1} />
+      <line x1={l.left} x2={l.width - l.right} y1={y0} y2={y0} stroke="var(--color-rule)" strokeWidth={1} />
       {tickIndexes(n, l.xTicks).map((i) => (
-        <text key={i} x={x(i)} y={l.height - 8} textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"} fill="var(--color-ink-faint)">
+        <text key={i} x={x(i)} y={l.height - 8} textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"} fill="var(--color-chalk-2)">
           {formatShortDate(rows[i].date)}
         </text>
       ))}

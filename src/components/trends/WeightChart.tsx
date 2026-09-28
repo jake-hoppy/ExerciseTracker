@@ -2,8 +2,8 @@ import type { AveragePoint, StatRow } from "@/lib/stats";
 import { formatShortDate, formatWeight } from "@/lib/format";
 import { DESKTOP, PHONE, ticks, tickIndexes, xScale, yScale, type Layout } from "./scale";
 
-// Rule R4 on a chart: raw readings are a thin line with small dots, the
-// 7-day average is the prominent line. Start and goal are hairlines.
+// Rule R4 on a chart: raw readings are a thin dim line with small dots, the
+// 7-day average is the bright chalk line. Start and goal are hairlines.
 export function WeightChart({
   rows,
   series,
@@ -22,7 +22,7 @@ export function WeightChart({
     ...(goalWeight !== null ? [goalWeight] : []),
   ];
   if (values.length === 0) {
-    return <p className="font-mono text-sm text-ink-faint">No weigh-ins in this range.</p>;
+    return <p className="font-mono text-sm text-chalk-3">No weigh-ins in this range.</p>;
   }
   const min = Math.floor(Math.min(...values)) - 1;
   const max = Math.ceil(Math.max(...values)) + 1;
@@ -77,56 +77,56 @@ function Drawing({
     >
       {ticks(min, max, 4).map((t) => (
         <g key={t}>
-          <line x1={l.left} x2={l.width - l.right} y1={y(t)} y2={y(t)} stroke="var(--color-line-soft)" strokeWidth={1} />
-          <text x={l.left - 6} y={y(t) + 4} textAnchor="end" fill="var(--color-ink-faint)">
+          <line x1={l.left} x2={l.width - l.right} y1={y(t)} y2={y(t)} stroke="var(--color-rule-soft)" strokeWidth={1} />
+          <text x={l.left - 6} y={y(t) + 4} textAnchor="end" fill="var(--color-chalk-3)">
             {t}
           </text>
         </g>
       ))}
       {goalWeight !== null && (
         <g>
-          <line x1={l.left} x2={l.width - l.right} y1={y(goalWeight)} y2={y(goalWeight)} stroke="var(--color-rust)" strokeWidth={1} />
-          <text x={l.width - l.right} y={y(goalWeight) - 4} textAnchor="end" fill="var(--color-ink-dim)" paintOrder="stroke" stroke="var(--color-bg)" strokeWidth={4}>
+          <line x1={l.left} x2={l.width - l.right} y1={y(goalWeight)} y2={y(goalWeight)} stroke="var(--color-gold)" strokeWidth={1} />
+          <text x={l.width - l.right} y={y(goalWeight) - 4} textAnchor="end" fill="var(--color-chalk-2)" paintOrder="stroke" stroke="var(--color-board)" strokeWidth={4}>
             goal {formatWeight(goalWeight)}
           </text>
         </g>
       )}
-      <path d={path(rawPts)} fill="none" stroke="var(--color-ink)" strokeWidth={1} strokeOpacity={0.7} strokeLinejoin="round" />
+      <path d={path(rawPts)} fill="none" stroke="var(--color-chalk-3)" strokeWidth={1} strokeLinejoin="round" />
       {rawPts.map((p, i) =>
         p === null ? null : anchored && i === 0 ? (
           // The origin is the block's start weight, drawn hollow so it never
           // reads as a weigh-in (rule R4).
           <g key={i}>
-            <circle cx={p[0]} cy={p[1]} r={3.5} fill="var(--color-bg)" stroke="var(--color-ink-faint)" strokeWidth={1.5}>
+            <circle cx={p[0]} cy={p[1]} r={3.5} fill="var(--color-board)" stroke="var(--color-chalk-3)" strokeWidth={1.5}>
               <title>{`${formatShortDate(rows[i].date)}: start weight ${formatWeight(rows[i].weight)} lb`}</title>
             </circle>
-            <text x={p[0] + 6} y={p[1] - 6} fill="var(--color-ink-faint)" paintOrder="stroke" stroke="var(--color-bg)" strokeWidth={4}>
+            <text x={p[0] + 6} y={p[1] - 6} fill="var(--color-chalk-3)" paintOrder="stroke" stroke="var(--color-board)" strokeWidth={4}>
               start {formatWeight(rows[i].weight)}
             </text>
           </g>
         ) : (
-          <circle key={i} cx={p[0]} cy={p[1]} r={2.5} fill="var(--color-ink)" stroke="var(--color-bg)" strokeWidth={1.5}>
+          <circle key={i} cx={p[0]} cy={p[1]} r={2.5} fill="var(--color-chalk-3)" stroke="var(--color-board)" strokeWidth={1.5}>
             <title>{`${formatShortDate(rows[i].date)}: ${formatWeight(rows[i].weight)} lb`}</title>
           </circle>
         ),
       )}
-      <path d={path(avgPts)} fill="none" stroke="var(--color-moss)" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+      <path d={path(avgPts)} fill="none" stroke="var(--color-chalk)" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
       {last && last.average !== null && (
         <text
           x={x(series.indexOf(last)) - 6}
           y={y(last.average) - 8}
           textAnchor="end"
-          fill="var(--color-ink)"
+          fill="var(--color-chalk)"
           fontWeight={600}
           paintOrder="stroke"
-          stroke="var(--color-bg)"
+          stroke="var(--color-board)"
           strokeWidth={4}
         >
           {formatWeight(last.average)}
         </text>
       )}
       {tickIndexes(n, l.xTicks).map((i) => (
-        <text key={i} x={x(i)} y={l.height - 8} textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"} fill="var(--color-ink-faint)">
+        <text key={i} x={x(i)} y={l.height - 8} textAnchor={i === 0 ? "start" : i === n - 1 ? "end" : "middle"} fill="var(--color-chalk-3)">
           {formatShortDate(rows[i].date)}
         </text>
       ))}

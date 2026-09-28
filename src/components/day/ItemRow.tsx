@@ -5,7 +5,7 @@ import type { ItemView } from "@/lib/day-screen";
 import { formatGrams, formatKcal } from "@/lib/format";
 import { ROW_GRID } from "./grid";
 
-// One tap logs it. The row flashes moss for 150ms; no toast. `trailing` is
+// One tap logs it. The row flashes chalk for 150ms; no toast. `trailing` is
 // an optional slot for the sheet's ⋯ button; it shares the row's last column.
 export function ItemRow({
   item,
@@ -18,7 +18,7 @@ export function ItemRow({
 }) {
   const [flash, setFlash] = useState(false);
   return (
-    <li className={`${ROW_GRID} min-h-11 transition-colors duration-150 ${flash ? "bg-moss/15" : ""}`}>
+    <li className={`${ROW_GRID} min-h-11 py-1.5 transition-colors duration-150 ${flash ? "bg-chalk/10" : ""}`}>
       <button
         type="button"
         onClick={() => {
@@ -28,12 +28,12 @@ export function ItemRow({
         }}
         className="col-span-4 grid min-h-11 grid-cols-subgrid items-center text-left"
       >
-        <span className={`font-mono ${flash ? "text-moss" : "text-ink-faint"}`}>+</span>
-        <span className="line-clamp-2 py-1.5 font-serif leading-tight text-ink">{item.name}</span>
-        <span className="text-right font-mono text-sm text-ink-dim tabular-nums">
+        <span className={`font-mono ${flash ? "text-chalk" : "text-chalk-3"}`}>+</span>
+        <span className="line-clamp-2 leading-snug text-chalk">{item.name}</span>
+        <span className="text-right font-mono text-sm text-chalk-2 tabular-nums">
           {formatKcal(item.calories)}
         </span>
-        <span className="text-right font-mono text-sm text-ink-dim tabular-nums">
+        <span className="text-right font-mono text-sm text-chalk-2 tabular-nums">
           {formatGrams(item.protein)}
         </span>
       </button>

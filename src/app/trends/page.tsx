@@ -17,17 +17,27 @@ export default async function TrendsPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 pt-4 pb-16">
-      <nav className="flex min-h-11 items-center justify-between">
-        <h1 className="font-display text-2xl font-semibold tracking-wide text-ink">
-          {t.block?.name ?? "Last 30 days"}
-        </h1>
-        <Link href="/" className="flex min-h-11 items-center font-mono text-sm text-ink-dim">
-          Today ›
+      <nav className="flex min-h-11 items-baseline justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl leading-tight font-bold tracking-tight text-chalk">
+            {t.block?.name ?? "Last 30 days"}
+          </h1>
+          <p className="mt-0.5 font-mono text-[13px] text-chalk-3">
+            {formatDateRange(t.range.start, t.range.end)}
+          </p>
+        </div>
+        <Link
+          href="/"
+          className="shrink-0 font-mono text-sm text-chalk-2 transition-colors duration-150 hover:text-chalk"
+        >
+          Today
         </Link>
       </nav>
-      <p className="font-mono text-sm text-ink-dim">{formatDateRange(t.range.start, t.range.end)}</p>
 
-      <section aria-label="Summary" className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+      <section
+        aria-label="Summary"
+        className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4"
+      >
         <StatTile
           lead
           label="Weight change"
@@ -35,10 +45,23 @@ export default async function TrendsPage() {
           unit={delta ? "lb" : undefined}
           note={delta ? `on the ${delta.window}-day average` : "needs two weigh-ins"}
         />
-        <StatTile label="Current streak" value={String(stats.currentStreak)} unit={stats.currentStreak === 1 ? "day" : "days"} />
-        <StatTile label="Longest streak" value={String(stats.longestStreak)} unit={stats.longestStreak === 1 ? "day" : "days"} />
+        <StatTile
+          label="Current streak"
+          value={String(stats.currentStreak)}
+          unit={stats.currentStreak === 1 ? "day" : "days"}
+        />
+        <StatTile
+          label="Longest streak"
+          value={String(stats.longestStreak)}
+          unit={stats.longestStreak === 1 ? "day" : "days"}
+        />
         <StatTile label="Logged" value={`${c.loggedDays} of ${c.totalDays}`} unit="days" />
-        <StatTile label="Trained" value={String(c.trainedDays)} unit="sessions" note={`${c.trainingDays} scheduled`} />
+        <StatTile
+          label="Trained"
+          value={String(c.trainedDays)}
+          unit="sessions"
+          note={`${c.trainingDays} scheduled`}
+        />
         <StatTile
           label="Average calories"
           value={formatKcal(stats.avgCalories === null ? null : Math.round(stats.avgCalories))}
@@ -53,31 +76,58 @@ export default async function TrendsPage() {
         />
       </section>
 
-      <section aria-label="Weight" className="mt-10">
-        <div className="mb-2 flex items-baseline justify-between">
-          <p className="label">Weight</p>
-          <p className="font-mono text-xs text-ink-faint">
-            <span className="mr-3"><span className="mr-1 inline-block h-0.5 w-4 bg-moss align-middle" />7-day average</span>
-            <span><span className="mr-1 inline-block h-px w-4 bg-ink align-middle" />daily</span>
+      <section aria-label="Weight" className="mt-12">
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-rule-soft pb-2">
+          <p className="font-mono text-sm text-chalk">Weight</p>
+          <p className="font-mono text-xs text-chalk-3">
+            <span className="mr-4">
+              <span className="mr-1.5 inline-block h-[3px] w-4 rounded-full bg-chalk align-middle" />
+              7-day average
+            </span>
+            <span>
+              <span className="mr-1.5 inline-block h-px w-4 bg-chalk-3 align-middle" />
+              daily
+            </span>
           </p>
         </div>
-        <WeightChart rows={t.rows} series={t.series} anchored={t.anchored} goalWeight={t.block?.goalWeight ?? null} />
+        <WeightChart
+          rows={t.rows}
+          series={t.series}
+          anchored={t.anchored}
+          goalWeight={t.block?.goalWeight ?? null}
+        />
       </section>
 
-      <section aria-label="Calories" className="mt-10">
-        <p className="label mb-2">Calories</p>
+      <section aria-label="Calories" className="mt-12">
+        <p className="mb-3 border-b border-rule-soft pb-2 font-mono text-sm text-chalk">Calories</p>
         <DailyBars rows={t.rows} field="calories" target={targets.calTarget} unit="kcal" />
       </section>
 
-      <section aria-label="Protein" className="mt-10">
-        <p className="label mb-2">Protein</p>
+      <section aria-label="Protein" className="mt-12">
+        <p className="mb-3 border-b border-rule-soft pb-2 font-mono text-sm text-chalk">Protein</p>
         <DailyBars rows={t.rows} field="protein" target={targets.proteinTarget} unit="g" />
       </section>
 
-      <Link href="/block" className="mt-10 flex min-h-11 items-center justify-between border-y border-line-soft font-mono text-sm text-ink-dim">
-        <span>Every day</span>
-        <span className="pr-1 text-lg">›</span>
-      </Link>
+      <nav
+        aria-label="More"
+        className="mt-12 grid grid-cols-2 divide-x divide-rule-soft border-y border-rule-soft"
+      >
+        {[
+          { href: "/", label: "Today", note: "Log the day" },
+          { href: "/block", label: "Every day", note: "Fill in a past day" },
+        ].map((l, i) => (
+          <Link
+            key={l.href}
+            href={l.href}
+            className={`flex min-h-16 flex-col justify-center gap-0.5 py-3 transition-colors duration-150 hover:bg-board-2 ${
+              i === 0 ? "pr-4" : "pl-4"
+            }`}
+          >
+            <span className="font-mono text-sm text-chalk">{l.label}</span>
+            <span className="text-xs text-chalk-3">{l.note}</span>
+          </Link>
+        ))}
+      </nav>
     </main>
   );
 }
